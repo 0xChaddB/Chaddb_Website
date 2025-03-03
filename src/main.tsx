@@ -1,29 +1,46 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { WagmiConfig, createConfig, configureChains } from "wagmi";
-import { mainnet } from "wagmi/chains";
-import { publicProvider } from "wagmi/providers/public";
-import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import "@rainbow-me/rainbowkit/styles.css";
-import App from "./App";
-import "./index.css";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { WagmiProvider } from 'wagmi';
+import { mainnet } from 'wagmi/chains';
+import { http } from 'viem';
+import {
+  RainbowKitProvider,
+  darkTheme,
+  getDefaultConfig,
+} from '@rainbow-me/rainbowkit';
+import '@rainbow-me/rainbowkit/styles.css';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import App from './App';
+import './index.css';
 
-// Configuration des chaînes et wallets
-const { chains, publicClient } = configureChains([mainnet], [publicProvider()]);
-const { connectors } = getDefaultWallets({
-  appName: "0xChaddB Portfolio",
-  projectId: "3ddaf49536fb377e34291bc7dd575f95",
-  chains,
+// Create wagmi config with RainbowKit
+const config = getDefaultConfig({
+  appName: '0xChaddB Portfolio',
+  projectId: '3ddaf49536fb377e34291bc7dd575f95',
+  chains: [mainnet],
+  transports: {
+    [mainnet.id]: http(),
+  },
 });
-const wagmiConfig = createConfig({ autoConnect: true, connectors, publicClient });
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+// Create React Query client
+const queryClient = new QueryClient();
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider chains={chains}>
-        <App />
-      </RainbowKitProvider>
-    </WagmiConfig>
+    <QueryClientProvider client={queryClient}>
+      <WagmiProvider config={config}>
+        <RainbowKitProvider
+          theme={darkTheme({
+            accentColor: '#00ff88',
+            accentColorForeground: '#121212',
+            borderRadius: 'medium',
+          })}
+          locale="en-US" 
+        >
+          <App />
+        </RainbowKitProvider>
+      </WagmiProvider>
+    </QueryClientProvider>
   </React.StrictMode>
 );
-
