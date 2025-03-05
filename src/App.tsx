@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
+import ProjectCarousel from './components/ProjectCarousel';
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -10,10 +11,8 @@ function App() {
   const [isMinting, setIsMinting] = useState(false);
   const [isMinted, setIsMinted] = useState(false);
 
-  // Use wagmi hooks for the latest version
   const { address, isConnected } = useAccount();
 
-  // Update status when connection changes
   useEffect(() => {
     if (isConnected && address) {
       setMintStatus("Wallet connected! You can now mint your NFT");
@@ -24,19 +23,13 @@ function App() {
     }
   }, [isConnected, address]);
 
-  // Function for simulating the mint process
   const handleMintNFT = async () => {
     if (!isConnected) return;
-
     setIsMinting(true);
     setMintStatus("Minting in progress...");
     setStatusType("connected");
-
-    // For demo purposes - simulate a transaction
     setTimeout(() => {
       setMintStatus("Transaction submitted! Waiting for confirmation...");
-
-      // Simulate confirmation after a delay
       setTimeout(() => {
         setMintStatus("NFT successfully minted!");
         setStatusType("success");
@@ -44,22 +37,10 @@ function App() {
         setIsMinted(true);
       }, 2000);
     }, 1500);
-
-    // For real implementation with a contract, you would use:
-    // import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
-    // const { writeContract, error, isPending } = useWriteContract()
-    // 
-    // And then call the contract with:
-    // writeContract({
-    //   address: '0xYourContractAddress',
-    //   abi: [...],
-    //   functionName: 'mint',
-    // })
   };
 
   return (
     <>
-      {/* Grid Background */}
       <div className="grid-bg"></div>
 
       {/* Contact Modal */}
@@ -137,50 +118,14 @@ function App() {
         </div>
       </section>
 
-      {/* Projects Section */}
-      <section id="projects" className="section section-dark">
-        <div className="section-content">
-          <h2 className="section-title">Featured Projects</h2>
-          <p className="section-subtitle">Here are some of my recent works in the Web3 space.</p>
-
-          <div className="projects-grid">
-            <div className="project-card">
-              <h3 className="project-title">DeFi Flashloan Protocol</h3>
-              <div className="project-tags">
-                <span className="project-tag">Solidity</span>
-                <span className="project-tag">React</span>
-                <span className="project-tag">Web3</span>
-              </div>
-              <p className="project-description">
-                Advanced lending protocol with innovative liquidation mechanisms and
-                multi-token collateral support.
-              </p>
-              <a href="#" className="project-link">View Project →</a>
-            </div>
-
-            <div className="project-card">
-              <h3 className="project-title">Swapper</h3>
-              <div className="project-tags">
-                <span className="project-tag">ERC-721</span>
-                <span className="project-tag">IPFS</span>
-                <span className="project-tag">Next.js</span>
-              </div>
-              <p className="project-description">
-                Decentralized NFT marketplace with advanced trading features
-                and cross-chain compatibility.
-              </p>
-              <a href="#" className="project-link">View Project →</a>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Projects Section avec Carousel */}
+      <ProjectCarousel />
 
       {/* Tech Stack Section */}
       <section id="stack" className="section">
         <div className="section-content">
           <h2 className="section-title">Tech Stack</h2>
           <p className="section-subtitle">Technologies and tools I specialize in.</p>
-
           <div className="tech-grid">
             <div className="tech-card">
               <div className="tech-icon">⚡</div>
@@ -190,7 +135,6 @@ function App() {
                 various blockchain platforms.
               </p>
             </div>
-
             <div className="tech-card">
               <div className="tech-icon">🌐</div>
               <h3 className="tech-name">Viem/Ethers.js</h3>
@@ -199,7 +143,6 @@ function App() {
                 modern JavaScript frameworks.
               </p>
             </div>
-
             <div className="tech-card">
               <div className="tech-icon">⚛️</div>
               <h3 className="tech-name">React</h3>
@@ -208,7 +151,6 @@ function App() {
                 frameworks like Next.js.
               </p>
             </div>
-
             <div className="tech-card">
               <div className="tech-icon">🦀</div>
               <h3 className="tech-name">Rust</h3>
@@ -229,19 +171,16 @@ function App() {
               <h2 className="nft-title">Claim Your Free NFT</h2>
               <p className="nft-description">As a thank you for visiting my site, claim this exclusive NFT that proves you were here.</p>
             </div>
-
             <div className="nft-content">
               <div className="nft-preview">
                 <img src="/images/NFTBadgeTest.png" alt="Visitor Badge NFT" className="nft-image" />
                 <div className="nft-badge">Free Mint</div>
               </div>
-
               <div className="nft-details">
                 <div>
                   <h3 className="nft-name">Visitor Badge #001</h3>
                   <p className="nft-info">This exclusive NFT is proof that you visited my portfolio. Each badge is unique and timestamped on the blockchain.</p>
                 </div>
-
                 <div className="nft-stats">
                   <div className="nft-stat">
                     <div className="nft-stat-value">100</div>
@@ -256,7 +195,6 @@ function App() {
                     <div className="nft-stat-label">Mint Price</div>
                   </div>
                 </div>
-
                 <div id="mint-status" className={`mint-status ${statusType}`}>{mintStatus}</div>
                 <div className="mint-controls">
                   <ConnectButton.Custom>
@@ -270,7 +208,6 @@ function App() {
                     }) => {
                       const ready = mounted;
                       const connected = ready && account && chain;
-
                       return (
                         <button
                           onClick={connected ? openAccountModal : openConnectModal}
@@ -282,7 +219,6 @@ function App() {
                       );
                     }}
                   </ConnectButton.Custom>
-
                   <button
                     onClick={handleMintNFT}
                     disabled={!isConnected || isMinting || isMinted}

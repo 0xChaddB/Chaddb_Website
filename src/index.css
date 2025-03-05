@@ -23,22 +23,25 @@ body {
   min-height: 100vh;
 }
 
-
 .grid-bg {
   position: fixed;
   top: 0;
   left: 0;
   width: 200%;
   height: 200%;
-  background: repeating-linear-gradient(transparent 0,
-      transparent 49px,
-      rgba(255, 255, 255, 0.1) 50px,
-      rgba(255, 255, 255, 0.1) 51px),
-    repeating-linear-gradient(90deg,
+  background: repeating-linear-gradient(
       transparent 0,
       transparent 49px,
       rgba(255, 255, 255, 0.1) 50px,
-      rgba(255, 255, 255, 0.1) 51px);
+      rgba(255, 255, 255, 0.1) 51px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 49px,
+      rgba(255, 255, 255, 0.1) 50px,
+      rgba(255, 255, 255, 0.1) 51px
+    );
   transform: rotate(-45deg);
   z-index: 0;
   opacity: 0.4;
@@ -320,23 +323,20 @@ body {
   margin-bottom: 4rem;
 }
 
-/* Projects Grid */
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 2rem;
-}
-
+/* ProjectCard Styles */
 .project-card {
   background: rgba(255, 255, 255, 0.03);
   border-radius: 20px;
   padding: 2rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s;
+  transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .project-card:hover {
-  transform: translateY(-5px);
+  transform: scale(1.02); /* Légère augmentation de taille */
   border-color: var(--glow);
   box-shadow: 0 10px 20px rgba(0, 255, 136, 0.1);
 }
@@ -366,6 +366,7 @@ body {
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 2rem;
   line-height: 1.6;
+  flex-grow: 1;
 }
 
 .project-link {
@@ -379,6 +380,101 @@ body {
 
 .project-link:hover {
   gap: 0.8rem;
+}
+
+/* Carousel Styles */
+.carousel-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  position: relative;
+  margin: 0 auto;
+  max-width: 1400px;
+}
+
+.carousel-content-wrapper {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.carousel-content {
+  display: flex;
+  transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+  width: 100%;
+}
+
+.carousel-item {
+  min-width: calc(100% / var(--visible-projects, 2));
+  padding: 0 1rem;
+  box-sizing: border-box;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  opacity: 0.9;
+}
+
+.carousel-item:hover {
+  opacity: 1;
+  z-index: 1;
+}
+
+.carousel-button {
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid var(--glow);
+  color: var(--glow);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+  font-size: 1.5rem;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.carousel-button:hover {
+  background: rgba(0, 255, 136, 0.2);
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+}
+
+.carousel-button:focus {
+  outline: 2px solid var(--glow);
+  outline-offset: 2px;
+}
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.carousel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.carousel-dot.active {
+  background: var(--glow);
+  box-shadow: 0 0 10px var(--glow);
+}
+
+.carousel-dot:hover:not(.active) {
+  background: rgba(0, 255, 136, 0.3);
+}
+
+.carousel-dot:focus {
+  outline: 2px solid var(--glow);
+  outline-offset: 2px;
 }
 
 /* Tech Stack */
@@ -464,19 +560,19 @@ body {
 
 .nft-preview {
   position: relative;
-  max-width: 500px;   
-  margin: 0 auto;      
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 .nft-image {
-  width: 100%;     
-  max-width: 500px;   
-  height: auto;     
+  width: 100%;
+  max-width: 500px;
+  height: auto;
   border-radius: 20px;
   border: 2px solid rgba(0, 255, 136, 0.3);
   transition: all 0.3s;
   display: block;
-  margin: 0 auto; 
+  margin: 0 auto;
 }
 
 .nft-badge {
@@ -586,8 +682,6 @@ body {
   }
 }
 
-
-
 /* Footer */
 footer {
   padding: 4rem 2rem;
@@ -605,20 +699,18 @@ footer {
   display: none;
 }
 
+/* Media Queries */
 @media (max-width: 992px) {
-
   .hero-title {
     font-size: 4rem;
   }
 
-  .projects-grid,
   .tech-grid {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   }
 }
 
 @media (max-width: 768px) {
-
   .nav-links {
     display: none;
     position: fixed;
@@ -658,13 +750,19 @@ footer {
     gap: 1rem;
   }
 
-  .projects-grid,
   .tech-grid,
   .nft-content {
     grid-template-columns: 1fr;
   }
 
-  /* Custom styles for RainbowKit button */
+  /* Carousel adjustments */
+  .carousel-button {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  /* RainbowKit custom styles */
   [data-rk] button {
     font-weight: 600 !important;
     font-size: 1rem !important;
@@ -677,7 +775,6 @@ footer {
     box-shadow: 0 10px 20px rgba(0, 255, 136, 0.2) !important;
   }
 
-  /* Custom styles for the wallet modal */
   [data-rk] {
     --rk-colors-accentColor: #00ff88 !important;
     --rk-colors-accentColorForeground: #121212 !important;
@@ -687,220 +784,39 @@ footer {
     --rk-radii-menuButton: 8px !important;
   }
 
-  /* Adjust layout for the mint controls when using RainbowKit */
   .mint-controls {
-    display: flex;
     flex-direction: column;
     gap: 1rem;
   }
 
-  @media (min-width: 768px) {
-    .mint-controls {
-      flex-direction: row;
-    }
-  }
-
-  /* Make RainbowKit button fit the design */
-  .mint-controls>div {
-    width: 100%;
-  }
-
-  /* Make the Connect button full width in the container */
-  .mint-controls [data-rk] button {
-    width: 100%;
-  }
-
-  .mint-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  @media (min-width: 768px) {
-    .mint-controls {
-      flex-direction: row;
-    }
-  }
-
-  /* Style de base pour le bouton RainbowKit */
-  [data-rk] button {
-    font-weight: 600 !important;
-    font-size: 1rem !important;
-    border-radius: 8px !important;
-    transition: all 0.3s !important;
-  }
-
-  /* Animation au survol */
-  [data-rk] button:hover {
-    transform: translateY(-3px) !important;
-    box-shadow: 0 10px 20px rgba(0, 255, 136, 0.2) !important;
-  }
-
-  /* Adapter RainbowKit au style du site */
-  [data-rk] {
-    --rk-colors-accentColor: #00ff88 !important;
-    --rk-colors-accentColorForeground: #121212 !important;
-    --rk-radii-actionButton: 8px !important;
-    --rk-radii-connectButton: 8px !important;
-    --rk-radii-menuButton: 8px !important;
-    --rk-radii-modal: 20px !important;
-    --rk-colors-connectButtonBackground: #00ff88 !important;
-    --rk-colors-connectButtonBackgroundError: #ff5555 !important;
-    --rk-colors-connectButtonInnerBackground: #00ff88 !important;
-    --rk-colors-connectButtonText: #121212 !important;
-    --rk-colors-connectButtonTextError: #ffffff !important;
-  }
-
-  /* S'assurer que le bouton RainbowKit utilise toute la largeur en mobile */
-  @media (max-width: 767px) {
-    [data-rk] {
-      width: 100%;
-    }
-  }
-  /* Faire en sorte que les boutons aient la même taille */
-  .mint-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  @media (min-width: 768px) {
-    .mint-controls {
-      flex-direction: row;
-    }
-  }
-
-  /* Forcer la taille du bouton RainbowKit */
-  [data-rk] {
-    width: 100% !important;  /* Prend toute la largeur disponible */
-  }
-
-  [data-rk] button {
-    width: 100% !important;
-    padding: 1rem 2rem !important;  /* Même padding que vos boutons */
-    font-size: 1rem !important;
-    font-weight: 600 !important;
-    height: auto !important;  /* Hauteur automatique plutôt que fixe */
-    border-radius: 8px !important;
-  }
-
-  /* Assurer que le bouton mint a la même taille */
+  .mint-controls [data-rk] button,
   .mint-button {
-    flex: 1;
     width: 100%;
   }
+}
 
-  /* Styles avancés pour le carrousel */
+@media (max-width: 640px) {
   .carousel-container {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    width: 100%;
-    position: relative;
-    margin: 0 auto;
-    max-width: 1200px;
-  }
-
-  .carousel-content-wrapper {
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .carousel-content {
-    display: flex;
-    transition: transform 0.4s ease;
-    width: 100%;
-  }
-
-  .carousel-item {
-    min-width: calc(100% / var(--visible-projects, 2));
-    padding: 0 1rem;
-    box-sizing: border-box;
-  }
-
-  .carousel-button {
-    background: rgba(0, 255, 136, 0.1);
-    border: 1px solid var(--glow);
-    color: var(--glow);
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-size: 1.5rem;
-    z-index: 2;
-    flex-shrink: 0;
-  }
-
-  .carousel-button:hover:not(:disabled) {
-    background: rgba(0, 255, 136, 0.2);
-    transform: scale(1.1);
-    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
-  }
-
-  .carousel-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .carousel-dots {
-    display: flex;
-    justify-content: center;
     gap: 0.5rem;
-    margin-top: 2rem;
   }
-
-  .carousel-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-
-  .carousel-dot.active {
-    background: var(--glow);
-    box-shadow: 0 0 10px var(--glow);
-  }
-
-  .carousel-dot:hover:not(:disabled):not(.active) {
-    background: rgba(0, 255, 136, 0.3);
-  }
-
-  .carousel-dot:disabled {
-    cursor: not-allowed;
-  }
-
-  /* Application du CSS custom property pour le nombre de projets visibles */
-  .carousel-content-wrapper {
-    --visible-projects: 2;
-  }
-
-  @media (max-width: 768px) {
-    .carousel-content-wrapper {
-      --visible-projects: 1;
-    }
-    
-    .carousel-button {
-      width: 40px;
-      height: 40px;
-      font-size: 1.2rem;
-    }
-  }
-
-  /* Animation des projets lors du défilement */
   .carousel-item {
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    padding: 0 0.25rem; /* Moins d’espace sur mobile */
   }
+  .carousel-button {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+}
 
-  .carousel-item:hover {
-    transform: translateY(-10px);
-    z-index: 1;
+@media (min-width: 1024px) {
+  .carousel-item {
+    padding: 0 1rem; /* Plus d’espace sur desktop */
+  }
+}
+
+@media (min-width: 768px) {
+  .mint-controls {
+    flex-direction: row;
   }
 }
