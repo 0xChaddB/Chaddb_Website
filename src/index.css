@@ -789,4 +789,118 @@ footer {
     flex: 1;
     width: 100%;
   }
+
+  /* Styles avancés pour le carrousel */
+  .carousel-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    position: relative;
+    margin: 0 auto;
+    max-width: 1200px;
+  }
+
+  .carousel-content-wrapper {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .carousel-content {
+    display: flex;
+    transition: transform 0.4s ease;
+    width: 100%;
+  }
+
+  .carousel-item {
+    min-width: calc(100% / var(--visible-projects, 2));
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  .carousel-button {
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid var(--glow);
+    color: var(--glow);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1.5rem;
+    z-index: 2;
+    flex-shrink: 0;
+  }
+
+  .carousel-button:hover:not(:disabled) {
+    background: rgba(0, 255, 136, 0.2);
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+  }
+
+  .carousel-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+  }
+
+  .carousel-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .carousel-dot.active {
+    background: var(--glow);
+    box-shadow: 0 0 10px var(--glow);
+  }
+
+  .carousel-dot:hover:not(:disabled):not(.active) {
+    background: rgba(0, 255, 136, 0.3);
+  }
+
+  .carousel-dot:disabled {
+    cursor: not-allowed;
+  }
+
+  /* Application du CSS custom property pour le nombre de projets visibles */
+  .carousel-content-wrapper {
+    --visible-projects: 2;
+  }
+
+  @media (max-width: 768px) {
+    .carousel-content-wrapper {
+      --visible-projects: 1;
+    }
+    
+    .carousel-button {
+      width: 40px;
+      height: 40px;
+      font-size: 1.2rem;
+    }
+  }
+
+  /* Animation des projets lors du défilement */
+  .carousel-item {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .carousel-item:hover {
+    transform: translateY(-10px);
+    z-index: 1;
+  }
 }
