@@ -16,6 +16,13 @@ export const projectsData: ProjectCardProps[] = [
     link: "https://github.com/0xChaddB/ChadVault"
   },
   {
+    id: "incoming-projects",
+    title: "Cooking some projects...",
+    tags: ["Be ready", "Hold your breath", "It's going to blow"],
+    description: "More projects incoming... ",
+    link: undefined
+  },
+  {
     id: "portfolio-dashboard",
     title: "Portfolio Dashboard",
     tags: ["TypeScript", "Wagmi", "Vite"],
