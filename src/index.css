@@ -22,6 +22,28 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
 }
+.app-container {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.background-logo {
+  position: absolute; /* Changement de fixed à absolute */
+  top: 0; /* Tout en haut */
+  left: 80%; /* Toujours à droite */
+  transform: translate(-50%, 0); /* Centré horizontalement, pas de décalage vertical */
+  width: 80vw;
+  height: auto;
+  max-width: 1200px;
+  opacity: 0.1;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.background-logo path {
+  stroke-width: 2;
+}
 
 .grid-bg {
   position: fixed;
@@ -500,15 +522,17 @@ body {
 }
 
 .tech-card:hover {
-  transform: translateY(-5px);
+  transform: scale(1.02);
   border-color: var(--glow);
   box-shadow: 0 10px 20px rgba(0, 255, 136, 0.1);
 }
 
 .tech-icon {
-  font-size: 3rem;
+  width: 3rem; /* Taille fixe pour SVG */
+  height: 3rem;
   margin-bottom: 1rem;
-  color: var(--glow);
+  color: var(--glow); /* Applique la couleur glow */
+  transition: transform 0.3s ease-in-out;
 }
 
 .tech-name {

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import ProjectCarousel from './components/ProjectCarousel';
+import { techStackData } from './data/techStack';
+import AnimatedLogo from './components/AnimatedLogo';
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -42,7 +44,7 @@ function App() {
   return (
     <>
       <div className="grid-bg"></div>
-
+      <AnimatedLogo className="background-logo" /> 
       {/* Contact Modal */}
       <div id="contact-modal" className={`contact-modal ${isContactModalOpen ? 'active' : ''}`}>
         <div className="contact-modal-content">
@@ -127,38 +129,16 @@ function App() {
           <h2 className="section-title">Tech Stack</h2>
           <p className="section-subtitle">Technologies and tools I specialize in.</p>
           <div className="tech-grid">
-            <div className="tech-card">
-              <div className="tech-icon">⚡</div>
-              <h3 className="tech-name">Solidity</h3>
-              <p className="tech-description">
-                Smart contract development and optimization for
-                various blockchain platforms.
-              </p>
-            </div>
-            <div className="tech-card">
-              <div className="tech-icon">🌐</div>
-              <h3 className="tech-name">Viem/Ethers.js</h3>
-              <p className="tech-description">
-                Blockchain interaction and dApp development with
-                modern JavaScript frameworks.
-              </p>
-            </div>
-            <div className="tech-card">
-              <div className="tech-icon">⚛️</div>
-              <h3 className="tech-name">React</h3>
-              <p className="tech-description">
-                Frontend development with React and modern
-                frameworks like Next.js.
-              </p>
-            </div>
-            <div className="tech-card">
-              <div className="tech-icon">🦀</div>
-              <h3 className="tech-name">Rust</h3>
-              <p className="tech-description">
-                High-performance blockchain development and
-                smart contract optimization.
-              </p>
-            </div>
+            {techStackData.map((tech, index) => {
+              const IconComponent = tech.icon; // Récupère le composant d’icône
+              return (
+                <div key={index} className="tech-card">
+                  <IconComponent className="tech-icon" />
+                  <h3 className="tech-name">{tech.name}</h3>
+                  <p className="tech-description">{tech.description}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
