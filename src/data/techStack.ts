@@ -1,4 +1,4 @@
-import { FaEthereum, FaJsSquare, FaReact, FaRust } from 'react-icons/fa';
+import { FaEthereum, FaReact, FaRust } from 'react-icons/fa';
 import { SiTypescript } from 'react-icons/si';
 
 export interface TechStackItem {
