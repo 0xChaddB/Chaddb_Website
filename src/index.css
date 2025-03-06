@@ -30,12 +30,12 @@ body {
 
 .background-logo {
   position: absolute; /* Changement de fixed à absolute */
-  top: 0; /* Tout en haut */
-  left: 80%; /* Toujours à droite */
+  top: 0; /* Tout en haut */  
+  left: 75%; /* Toujours à droite */
   transform: translate(-50%, 0); /* Centré horizontalement, pas de décalage vertical */
-  width: 80vw;
+  width: 48vw;
   height: auto;
-  max-width: 1200px;
+  max-width: 800px;
   opacity: 0.1;
   z-index: -1;
   pointer-events: none;
