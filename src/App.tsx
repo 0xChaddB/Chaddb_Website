@@ -153,7 +153,7 @@ function App() {
             </div>
             <div className="nft-content">
               <div className="nft-preview">
-                <img src="/images/NFTBadgeTest.png" alt="Visitor Badge NFT" className="nft-image" />
+                <img src="/images/LogoFerneth.svg" alt="Visitor Badge NFT" className="nft-image" />
                 <div className="nft-badge">Free Mint</div>
               </div>
               <div className="nft-details">
@@ -182,7 +182,6 @@ function App() {
                       account,
                       chain,
                       openAccountModal,
-                      openChainModal,
                       openConnectModal,
                       mounted,
                     }) => {
