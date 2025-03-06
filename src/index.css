@@ -104,8 +104,6 @@ body {
 .nav-links {
   display: flex;
   gap: 3rem;
-  transition: opacity 0.3s ease-in-out;
-  opacity: 0;
 }
 
 .nav-link {
@@ -122,10 +120,6 @@ body {
   border-color: var(--glow);
   border-radius: 12px;
   text-shadow: 0 0 10px var(--glow);
-}
-
-.nav-links.active {
-  opacity: 1;
 }
 
 /* Hero Section */
