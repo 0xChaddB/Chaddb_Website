@@ -153,22 +153,17 @@ function App() {
             </div>
             <div className="nft-content">
               <div className="nft-preview">
-                <img src="/images/LogoFerneth.svg" alt="Visitor Badge NFT" className="nft-image" />
-                <div className="nft-badge">Free Mint</div>
+                <img src="/images/LogoRecolored.svg" alt="Visitor Badge NFT" className="nft-image" />
               </div>
               <div className="nft-details">
                 <div>
                   <h3 className="nft-name">Visitor Badge #001</h3>
-                  <p className="nft-info">This exclusive NFT is proof that you visited my portfolio. Each badge is unique and timestamped on the blockchain.</p>
+                  <p className="nft-info">This NFT changes color randomly at each mint, ensuring a unique NFT for everyone!</p>
                 </div>
                 <div className="nft-stats">
                   <div className="nft-stat">
-                    <div className="nft-stat-value">100</div>
+                    <div className="nft-stat-value">1000</div>
                     <div className="nft-stat-label">Total Supply</div>
-                  </div>
-                  <div className="nft-stat">
-                    <div className="nft-stat-value">1</div>
-                    <div className="nft-stat-label">Per Wallet</div>
                   </div>
                   <div className="nft-stat">
                     <div className="nft-stat-value">Free</div>

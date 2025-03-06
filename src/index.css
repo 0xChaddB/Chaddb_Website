@@ -442,6 +442,7 @@ body {
   opacity: 0.9;
   scroll-snap-align: center;
   overflow: hidden;
+  scroll-snap-align: start;
 }
 
 .carousel-item:hover {
@@ -590,7 +591,7 @@ body {
 
 .nft-preview {
   position: relative;
-  max-width: 500px;
+  max-width: 700px;
   margin: 0 auto;
 }
 
@@ -598,23 +599,9 @@ body {
   width: 100%;
   max-width: 500px;
   height: auto;
-  border-radius: 20px;
-  border: 2px solid rgba(0, 255, 136, 0.3);
   transition: all 0.3s;
   display: block;
   margin: 0 auto;
-}
-
-.nft-badge {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: linear-gradient(45deg, var(--glow), var(--glow-secondary));
-  color: var(--darker);
-  padding: 0.5rem 1rem;
-  border-radius: 100px;
-  font-weight: 600;
-  font-size: 0.9rem;
 }
 
 .nft-details {
@@ -831,6 +818,7 @@ footer {
   }
   .carousel-item {
     padding: 0 0.25rem;
+    min-width: 100%;
   }
   .carousel-button {
     width: 40px;
@@ -842,11 +830,21 @@ footer {
 @media (min-width: 1024px) {
   .carousel-item {
     padding: 0 1rem; 
+    min-width: 33.33%;
+  }
+  .carousel-content:has(> .carousel-item:nth-last-child(-n+1):nth-child(4)) .carousel-item:nth-child(4) {
+    min-width: 100%; /* Le dernier projet (4e) prend toute la largeur */
   }
 }
 
 @media (min-width: 768px) {
   .mint-controls {
     flex-direction: row;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .carousel-item {
+    min-width: 50%; /* 2 projets */
   }
 }

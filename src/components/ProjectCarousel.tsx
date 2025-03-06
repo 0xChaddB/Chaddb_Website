@@ -3,11 +3,11 @@ import ProjectCard from './ProjectCard';
 import { projectsData } from '../data/projects';
 
 const ProjectCarousel = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentGroup, setCurrentGroup] = useState(0);
   const [visibleProjects, setVisibleProjects] = useState(2);
   const carouselRef = useRef<HTMLDivElement>(null);
 
-  // Gestion responsive avec paliers
+  // Gestion responsive
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -27,14 +27,54 @@ const ProjectCarousel = () => {
     }
   }, [visibleProjects]);
 
-  // Synchronisation de l’index avec le défilement
+  // Calcul du nombre total de groupes
+  const totalGroups = Math.ceil(projectsData.length / visibleProjects) || 1;
+  // Ajustement pour desktop avec 4 projets
+  const isDesktopWithExtra = window.innerWidth >= 1024 && projectsData.length === 4;
+  const adjustedTotalGroups = isDesktopWithExtra ? 2 : totalGroups;
+
+  // Défilement vers le groupe suivant
+  const next = useCallback(() => {
+    if (!carouselRef.current) return;
+    const itemWidth = carouselRef.current.scrollWidth / projectsData.length;
+    const newGroup = Math.min(currentGroup + 1, adjustedTotalGroups - 1);
+    
+    let newScrollLeft;
+    if (isDesktopWithExtra && newGroup === 1) {
+      // Dernier projet (4e) prend toute la largeur sur desktop
+      newScrollLeft = 3 * itemWidth; // Position après les 3 premiers projets
+    } else {
+      newScrollLeft = newGroup * visibleProjects * itemWidth;
+    }
+    
+    carouselRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
+    setCurrentGroup(newGroup);
+  }, [currentGroup, visibleProjects, adjustedTotalGroups, isDesktopWithExtra]);
+
+  // Défilement vers le groupe précédent
+  const prev = useCallback(() => {
+    if (!carouselRef.current) return;
+    const itemWidth = carouselRef.current.scrollWidth / projectsData.length;
+    const newGroup = Math.max(currentGroup - 1, 0);
+    const newScrollLeft = newGroup * visibleProjects * itemWidth;
+    
+    carouselRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
+    setCurrentGroup(newGroup);
+  }, [currentGroup, visibleProjects]);
+
+  // Synchronisation de l’index avec le défilement manuel
   useEffect(() => {
     const handleScroll = () => {
       if (!carouselRef.current) return;
       const scrollLeft = carouselRef.current.scrollLeft;
       const itemWidth = carouselRef.current.scrollWidth / projectsData.length;
-      const newIndex = Math.round(scrollLeft / itemWidth);
-      setCurrentIndex(newIndex);
+      let newGroup;
+      if (isDesktopWithExtra && scrollLeft >= 3 * itemWidth) {
+        newGroup = 1;
+      } else {
+        newGroup = Math.round(scrollLeft / (itemWidth * visibleProjects));
+      }
+      setCurrentGroup(newGroup);
     };
 
     const carousel = carouselRef.current;
@@ -42,21 +82,7 @@ const ProjectCarousel = () => {
       carousel.addEventListener('scroll', handleScroll);
       return () => carousel.removeEventListener('scroll', handleScroll);
     }
-  }, []);
-
-  const next = useCallback(() => {
-    if (!carouselRef.current) return;
-    const itemWidth = carouselRef.current.scrollWidth / projectsData.length;
-    const newScrollLeft = (currentIndex + 1) * itemWidth;
-    carouselRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
-  }, [currentIndex]);
-
-  const prev = useCallback(() => {
-    if (!carouselRef.current) return;
-    const itemWidth = carouselRef.current.scrollWidth / projectsData.length;
-    const newScrollLeft = (currentIndex - 1) * itemWidth;
-    carouselRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
-  }, [currentIndex]);
+  }, [visibleProjects, isDesktopWithExtra]);
 
   // Auto-scroll
   useEffect(() => {
@@ -64,14 +90,19 @@ const ProjectCarousel = () => {
     return () => clearInterval(interval);
   }, [next]);
 
-  const goToSlide = useCallback((index: number) => {
+  // Aller à un groupe spécifique via les dots
+  const goToGroup = useCallback((groupIndex: number) => {
     if (!carouselRef.current) return;
     const itemWidth = carouselRef.current.scrollWidth / projectsData.length;
-    const newScrollLeft = index * itemWidth;
+    let newScrollLeft;
+    if (isDesktopWithExtra && groupIndex === 1) {
+      newScrollLeft = 3 * itemWidth; // Position du 4e projet
+    } else {
+      newScrollLeft = groupIndex * visibleProjects * itemWidth;
+    }
     carouselRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
-  }, []);
-
-  const dotsCount = Math.max(1, projectsData.length - visibleProjects + 1);
+    setCurrentGroup(groupIndex);
+  }, [visibleProjects, isDesktopWithExtra]);
 
   return (
     <section id="projects" className="section section-dark" role="region" aria-label="Featured Projects Carousel">
@@ -83,7 +114,8 @@ const ProjectCarousel = () => {
           <button 
             className="carousel-button carousel-button-prev" 
             onClick={prev}
-            aria-label="Previous projects"
+            disabled={currentGroup === 0}
+            aria-label="Previous project group"
           >
             ❮
           </button>
@@ -107,19 +139,20 @@ const ProjectCarousel = () => {
           <button 
             className="carousel-button carousel-button-next" 
             onClick={next}
-            aria-label="Next projects"
+            disabled={currentGroup === adjustedTotalGroups - 1}
+            aria-label="Next project group"
           >
             ❯
           </button>
         </div>
         
         <div className="carousel-dots">
-          {Array.from({ length: dotsCount }).map((_, index) => (
+          {Array.from({ length: adjustedTotalGroups }).map((_, index) => (
             <button
               key={`dot-${index}`}
-              className={`carousel-dot ${index === currentIndex ? 'active' : ''}`}
-              onClick={() => goToSlide(index)}
-              aria-label={`Go to project set ${index + 1}`}
+              className={`carousel-dot ${index === currentGroup ? 'active' : ''}`}
+              onClick={() => goToGroup(index)}
+              aria-label={`Go to project group ${index + 1}`}
             />
           ))}
         </div>

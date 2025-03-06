@@ -14,7 +14,7 @@ const NFT_CONTRACT_ABI = [
 ] as const;
 
 export default function NFTMinter() {
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const [mintStatus, setMintStatus] = useState<string>('Connect wallet to claim your NFT');
   const [statusType, setStatusType] = useState<string>('');
   const [isMinting, setIsMinting] = useState(false);
