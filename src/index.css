@@ -810,6 +810,15 @@ footer {
   .mint-button {
     width: 100%;
   }
+  
+  .background-logo {
+    top: 70%; /* Centre verticalement */
+    left: 70%; /* Centre horizontalement */
+    transform: translate(-50%, -50%); /* Centre précisément */
+    width: 100vw; /* Plus grand, 80% de la largeur de l’écran */
+    max-width: none; /* Supprime la limite pour mobile */
+    opacity: 0.16; /* Légèrement plus discret si besoin */
+  }
 }
 
 @media (max-width: 640px) {
