@@ -10,8 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@biconomy/account": "^4.5.7",
+    "@helia/http": "^2.0.4",
+    "@helia/json": "^4.0.2",
     "@rainbow-me/rainbowkit": "^2.2.4",
     "@tanstack/react-query": "^5.0.0",
+    "ipfs-http-client": "^60.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",

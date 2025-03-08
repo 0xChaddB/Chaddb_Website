@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { WagmiProvider } from 'wagmi';
-import { mainnet } from 'wagmi/chains';
+import { polygon } from 'wagmi/chains'; // Mainnet Polygon
 import { http } from 'viem';
 import {
   RainbowKitProvider,
@@ -13,17 +13,15 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
 import './index.css';
 
-// Create wagmi config with RainbowKit
 const config = getDefaultConfig({
   appName: '0xChaddB Portfolio',
-  projectId: '3ddaf49536fb377e34291bc7dd575f95',
-  chains: [mainnet],
+  projectId: '3ddaf49536fb377e34291bc7dd575f95', // Ton WalletConnect project ID
+  chains: [polygon], // Mainnet Polygon
   transports: {
-    [mainnet.id]: http(),
+    [polygon.id]: http('https://polygon-mainnet.infura.io/v3/ede8136edbb24fe0b2c5194483b8d6ed'), // Ton API key
   },
 });
 
-// Create React Query client
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -36,7 +34,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             accentColorForeground: '#121212',
             borderRadius: 'medium',
           })}
-          locale="en-US" 
+          locale="en-US"
         >
           <App />
         </RainbowKitProvider>
