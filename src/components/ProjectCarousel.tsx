@@ -84,11 +84,6 @@ const ProjectCarousel = () => {
     }
   }, [visibleProjects, isDesktopWithExtra]);
 
-  // Auto-scroll
-  useEffect(() => {
-    const interval = setInterval(next, 7000);
-    return () => clearInterval(interval);
-  }, [next]);
 
   // Aller à un groupe spécifique via les dots
   const goToGroup = useCallback((groupIndex: number) => {
