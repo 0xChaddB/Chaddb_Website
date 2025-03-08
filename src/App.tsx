@@ -4,6 +4,7 @@ import { useAccount } from 'wagmi';
 import ProjectCarousel from './components/ProjectCarousel';
 import { techStackData } from './data/techStack';
 import AnimatedLogo from './components/AnimatedLogo';
+import NFTLogo from './components/NFTLogo';
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -153,7 +154,7 @@ function App() {
             </div>
             <div className="nft-content">
               <div className="nft-preview">
-                <img src="/images/LogoRecolored.svg" alt="Visitor Badge NFT" className="nft-image" />
+                <NFTLogo className="nft-image" />
               </div>
               <div className="nft-details">
                 <div>
