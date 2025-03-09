@@ -1,16 +1,15 @@
 import mongoose from 'mongoose';
 
 const nftSchema = new mongoose.Schema({
-    owner: { type: String, required: true },
-    metadataURI: { type: String, required: true },
-    colors: {
-        color1: { type: String },
-        color2: { type: String },
-        color3: { type: String }
-    },
-    taskId: { type: String, unique: true },
-    mintedAt: { type: Date, default: Date.now } 
+  owner: { type: String, required: true },
+  metadataURI: { type: String, required: true },
+  colors: {
+    color1: String,
+    color2: String,
+    color3: String,
+  },
+  taskId: { type: String, required: true },
+  timestamp: { type: Date, default: Date.now },
 });
 
-const NFT = mongoose.model('NFT', nftSchema);
-export default NFT;
+export default mongoose.model('NFT', nftSchema);

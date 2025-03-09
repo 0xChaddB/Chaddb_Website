@@ -2,167 +2,151 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { createWalletClient, http, parseEther, encodeFunctionData } from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
-import { polygonMumbai, polygonAmoy } from 'viem/chains';
+import pinataSDK from '@pinata/sdk';
+import { createPublicClient, encodeFunctionData, http } from 'viem';
+import { polygonAmoy } from 'viem/chains';
+import { Relayer } from '@openzeppelin/defender-relay-client'; // ✅ Only Relayer needed
 import NFT from './models/NFT.js';
+import fs from 'node:fs/promises';
+import { Readable } from 'stream';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// **🔍 Charger `.env` sans dépendre du shell**
-const envPath = path.join(__dirname, '.env');
-if (fs.existsSync(envPath)) {
-    const envVars = fs.readFileSync(envPath, 'utf8').split('\n');
-    envVars.forEach(line => {
-        const [key, value] = line.split('=');
-        if (key && value) process.env[key.trim()] = value.trim();
-    });
-} else {
-    console.error("❌ Fichier `.env` introuvable !");
-    process.exit(1);
-}
-
-dotenv.config(); // Charger aussi via dotenv en backup
+dotenv.config();
+console.log('ENV après chargement:', process.env.NFT_CONTRACT_ADDRESS);
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🔍 Vérifier si `.env` est bien chargé
-console.log("🔍 PRIVATE_KEY =", process.env.PRIVATE_KEY ? "✅ OK" : "❌ NON DÉFINI");
-console.log("🔍 MONGO_URI =", process.env.MONGO_URI ? "✅ OK" : "❌ NON DÉFINI");
-console.log("🔍 RPC_URL =", process.env.RPC_URL ? "✅ OK" : "❌ NON DÉFINI");
+// ✅ Charger l'ABI du contrat
+let nftABI;
+try {
+  const abiContent = await fs.readFile(new URL('./nftABI.json', import.meta.url), 'utf8');
+  if (!abiContent.trim()) throw new Error('nftABI.json est vide');
+  nftABI = JSON.parse(abiContent);
+  console.log('✅ ABI chargé');
+} catch (error) {
+  console.error('❌ Erreur lors du chargement de nftABI.json:', error.message);
+  process.exit(1);
+}
 
-// **Connexion à MongoDB**
+// ✅ Vérifier les variables d'environnement
+console.log('MONGO_URI:', process.env.MONGO_URI ? '✅ OK' : '❌ NON DÉFINI');
+console.log('RPC_URL:', process.env.RPC_URL ? '✅ OK' : '❌ NON DÉFINI');
+console.log('NFT_CONTRACT_ADDRESS:', process.env.NFT_CONTRACT_ADDRESS);
+console.log('PINATA_API_KEY:', process.env.PINATA_API_KEY ? '✅ OK' : '❌ NON DÉFINI');
+console.log('PINATA_API_SECRET:', process.env.PINATA_API_SECRET ? '✅ OK' : '❌ NON DÉFINI');
+console.log('DEFENDER_API_KEY:', process.env.DEFENDER_API_KEY ? '✅ OK' : '❌ NON DÉFINI');
+console.log('DEFENDER_API_SECRET:', process.env.DEFENDER_API_SECRET ? '✅ OK' : '❌ NON DÉFINI');
+
+// ✅ Connexion à MongoDB
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('✅ MongoDB connecté'))
-    .catch(err => {
-        console.error('❌ Erreur MongoDB:', err);
-        process.exit(1);
+  .then(() => console.log('✅ MongoDB connecté'))
+  .catch(err => {
+    console.error('❌ Erreur MongoDB:', err);
+    process.exit(1);
+  });
+
+// ✅ Connexion à Pinata
+const pinata = new pinataSDK(process.env.PINATA_API_KEY, process.env.PINATA_API_SECRET);
+
+// ✅ Initialisation du client OpenZeppelin Defender
+const relayer = new Relayer({
+  apiKey: process.env.DEFENDER_API_KEY,
+  apiSecret: process.env.DEFENDER_API_SECRET,
+});
+
+// ✅ Setup Viem pour Polygon Amoy
+const publicClient = createPublicClient({
+  chain: polygonAmoy,
+  transport: http(process.env.RPC_URL),
+});
+
+// ✅ Générer des couleurs aléatoires pour le NFT
+function generateRandomColors() {
+  const generateColor = () => `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
+  return {
+    path1: generateColor(),
+    path2: generateColor(),
+    path3: generateColor(),
+    path4: generateColor(),
+  };
+}
+
+// ✅ Générer un NFT SVG avec les couleurs aléatoires
+async function generateSVGWithColors(colors) {
+  const baseSvg = await fs.readFile(new URL('./base.svg', import.meta.url), 'utf8');
+  return baseSvg
+    .replace('{COLOR1}', colors.path1)
+    .replace('{COLOR2}', colors.path2)
+    .replace('{COLOR3}', colors.path3)
+    .replace('{COLOR4}', colors.path4);
+}
+
+// 🔥 Mint NFT Endpoint (via OpenZeppelin Defender)
+app.post('/mint-nft', async (req, res) => {
+  try {
+    const { recipient } = req.body;
+    if (!recipient) return res.status(400).json({ error: 'Recipient requis' });
+
+    console.log('🔍 Minting NFT pour', recipient);
+
+    const colors = generateRandomColors();
+    const svgImage = await generateSVGWithColors(colors);
+
+    const imageResponse = await pinata.pinFileToIPFS(Readable.from(svgImage), {
+      pinataMetadata: { name: `nft-image-${Date.now()}.svg` },
+      pinataOptions: { cidVersion: 0 },
+    });
+    const imageURI = `ipfs://${imageResponse.IpfsHash}`;
+    console.log('✅ Image stockée sur IPFS:', imageURI);
+
+    const totalMinted = await publicClient.readContract({
+      address: process.env.NFT_CONTRACT_ADDRESS,
+      abi: nftABI,
+      functionName: 'totalMinted',
+    });
+    const tokenId = BigInt(totalMinted) + BigInt(1);
+    console.log('✅ Token ID calculé:', Number(tokenId));
+
+    const metadata = {
+      name: `Visitor Badge #${tokenId}`,
+      description: "An exclusive NFT proving you visited 0xChaddB's portfolio.",
+      image: imageURI,
+      attributes: [
+        { trait_type: 'Path 1 Color', value: colors.path1 },
+        { trait_type: 'Path 2 Color', value: colors.path2 },
+        { trait_type: 'Path 3 Color', value: colors.path3 },
+        { trait_type: 'Path 4 Color', value: colors.path4 },
+      ],
+    };
+    const metadataResponse = await pinata.pinJSONToIPFS(metadata);
+    const metadataURI = `ipfs://${metadataResponse.IpfsHash}`;
+    console.log('✅ Métadonnées stockées sur IPFS:', metadataURI);
+
+    const functionData = encodeFunctionData({
+      abi: nftABI,
+      functionName: 'entryMint',
+      args: [recipient, metadataURI],
     });
 
-// **Corriger et parser l'ABI**
-try {
-    console.log("🔍 ABI brute :", process.env.ABI);
+    const txResponse = await relayer.sendTransaction({
+      to: process.env.NFT_CONTRACT_ADDRESS,
+      data: functionData,
+      gasLimit: 500000,
+      speed: 'fast',
+    });
+    console.log('✅ Transaction envoyée:', txResponse.transactionId);
 
-    // Corriger les guillemets et les espaces mal placés
-    const ABI_STRING = process.env.ABI.replace(/\\/g, '').trim();
+    // Enregistrer dans MongoDB avec l'ID Defender
+    const nft = new NFT({ owner: recipient, metadataURI, colors, taskId: txResponse.transactionId });
+    await nft.save();
 
-    // Vérifier avant parsing
-    if (!ABI_STRING.startsWith("{") && !ABI_STRING.startsWith("[")) {
-        throw new Error("ABI mal formatée : elle doit commencer par `{` ou `[`.");
-    }
-
-    var abi = JSON.parse(ABI_STRING);
-    console.log("✅ ABI chargée :", abi);
-} catch (error) {
-    console.error("❌ Erreur parsing ABI :", error.message);
-    process.exit(1);
-}
-
-// **Sélectionner le bon réseau**
-const CHAIN_ID = parseInt(process.env.CHAIN_ID, 10);
-const NETWORK = CHAIN_ID === 80002 ? polygonAmoy : polygonMumbai;
-
-const provider = http(process.env.RPC_URL);
-const account = privateKeyToAccount(process.env.PRIVATE_KEY);
-
-const walletClient = createWalletClient({
-    account,
-    chain: NETWORK,
-    transport: provider
+    res.json({ success: true, txId: txResponse.transactionId, metadataURI });
+  } catch (error) {
+    console.error('❌ Erreur Minting:', error);
+    res.status(500).json({ error: 'Mint échoué', details: error.message });
+  }
 });
 
-// **Fonction pour générer des couleurs aléatoires**
-function generateRandomColors() {
-    return {
-        color1: `#${Math.floor(Math.random()*16777215).toString(16)}`,
-        color2: `#${Math.floor(Math.random()*16777215).toString(16)}`,
-        color3: `#${Math.floor(Math.random()*16777215).toString(16)}`
-    };
-}
-
-// **Endpoint : Mint NFT avec Viem**
-app.post('/mint-nft', async (req, res) => {
-    try {
-        console.log("📩 Headers reçus :", req.headers);
-        console.log("📩 Body reçu :", req.body);
-
-        const { recipient, metadataURI } = req.body;
-
-        if (!recipient || !metadataURI) {
-            return res.status(400).json({ error: "Recipient et metadataURI sont requis" });
-        }
-
-        console.log("🔍 Minting NFT pour", recipient);
-
-        // **Construire la transaction**
-        const functionData = encodeFunctionData({
-            abi,
-            functionName: "mint",
-            args: [recipient, metadataURI]
-        });
-
-        const txHash = await walletClient.sendTransaction({
-            account,
-            to: process.env.NFT_CONTRACT_ADDRESS,
-            data: functionData,
-            value: parseEther('0'), // Envoi de 0 MATIC
-            gas: 300000 // Ajuster selon les besoins
-        });
-
-        console.log("✅ Transaction envoyée :", txHash);
-
-        // **Sauvegarde en base**
-        const nft = new NFT({ owner: recipient, metadataURI, colors: generateRandomColors(), taskId: txHash });
-        await nft.save();
-
-        res.json({ success: true, txHash, nft });
-    } catch (error) {
-        console.error("❌ Erreur Minting Viem :", error);
-        res.status(500).json({ error: 'Mint échoué', details: error.message });
-    }
-});
-
-// **Endpoint : Récupérer les NFTs d'un utilisateur**
-app.get('/nft/:owner', async (req, res) => {
-    try {
-        const nfts = await NFT.find({ owner: req.params.owner });
-        res.json(nfts);
-    } catch (error) {
-        console.error('❌ Erreur récupération NFTs:', error);
-        res.status(500).json({ error: 'Impossible de récupérer les NFTs' });
-    }
-});
-
-// **Endpoint : API Metadata pour OpenSea**
-app.get('/metadata/:taskId', async (req, res) => {
-    try {
-        const nft = await NFT.findOne({ taskId: req.params.taskId });
-        if (!nft) return res.status(404).json({ error: "NFT non trouvé" });
-
-        const metadata = {
-            name: "NFT Unique",
-            description: "Un NFT avec des couleurs générées aléatoirement",
-            image: nft.metadataURI,
-            attributes: [
-                { trait_type: "Couleur 1", value: nft.colors.color1 },
-                { trait_type: "Couleur 2", value: nft.colors.color2 },
-                { trait_type: "Couleur 3", value: nft.colors.color3 }
-            ]
-        };
-
-        res.json(metadata);
-    } catch (error) {
-        console.error('❌ Erreur récupération Metadata:', error);
-        res.status(500).json({ error: 'Impossible de récupérer les metadata' });
-    }
-});
-
-// **Lancer le serveur**
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`));
