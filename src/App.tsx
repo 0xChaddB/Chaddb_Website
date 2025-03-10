@@ -25,7 +25,7 @@ function App() {
   const [isMinted, setIsMinted] = useState(false);
   const [nextTokenId, setNextTokenId] = useState(0);
   const [mintedNFTInfo, setMintedNFTInfo] = useState<MintedNFTInfo | null>(null);
-  const [setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { address, isConnected } = useAccount();
 
@@ -62,6 +62,7 @@ function App() {
     if (!isConnected || !address) return;
     
     setIsMinting(true);
+    setIsLoading(true);
     setMintStatus("Minting en cours...");
     setStatusType("connected");
     
@@ -104,6 +105,7 @@ function App() {
       setStatusType("error");
     } finally {
       setIsMinting(false);
+      setIsLoading(false);
     }
   };
   const NFTMintedDetails = () => {
@@ -275,38 +277,47 @@ function App() {
                 </div>
                 <div id="mint-status" className={`mint-status ${statusType}`}>{mintStatus}</div>
                 <div className="mint-controls">
-                  <ConnectButton.Custom>
-                    {({
-                      account,
-                      chain,
-                      openAccountModal,
-                      openConnectModal,
-                      mounted,
-                    }) => {
-                      const ready = mounted;
-                      const connected = ready && account && chain;
-                      return (
-                        <button
-                          onClick={connected ? openAccountModal : openConnectModal}
-                          type="button"
-                          className="button button-primary mint-button"
-                        >
-                          {connected ? `${account.displayName}` : "Connect Wallet"}
-                        </button>
-                      );
-                    }}
-                  </ConnectButton.Custom>
-                  <button
-                    onClick={handleMintNFT}
-                    disabled={!isConnected || isMinting || isMinted}
-                    className="button button-secondary mint-button"
-                  >
-                    {isMinting ? 'Minting...' : isMinted ? 'Minted ✓' : 'Mint NFT'}
-                    {isMinted && mintedNFTInfo && (
-                      <NFTMintedDetails />
-                    )}
-                  </button>
-                </div>
+                <ConnectButton.Custom>
+                  {({
+                    account,
+                    chain,
+                    openAccountModal,
+                    openConnectModal,
+                    mounted,
+                  }) => {
+                    const ready = mounted;
+                    const connected = ready && account && chain;
+                    return (
+                      <button
+                        onClick={connected ? openAccountModal : openConnectModal}
+                        type="button"
+                        className="button button-primary mint-button"
+                      >
+                        {connected ? `${account.displayName}` : "Connect Wallet"}
+                      </button>
+                    );
+                  }}
+                </ConnectButton.Custom>
+                
+                {isLoading && (
+                  <div className="loading-spinner-container">
+                    <div className="loading-spinner"></div>
+                    <span>Chargement...</span>
+                  </div>
+                )}
+                
+                <button
+                  onClick={handleMintNFT}
+                  disabled={!isConnected || isMinting || isMinted}
+                  className="button button-secondary mint-button"
+                >
+                  {isMinting ? 'Minting...' : isMinted ? 'Minted ✓' : 'Mint NFT'}
+                </button>
+                
+                {isMinted && mintedNFTInfo && (
+                  <NFTMintedDetails />
+                )}
+              </div>
               </div>
             </div>
           </div>
