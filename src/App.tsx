@@ -25,7 +25,7 @@ function App() {
   const [isMinted, setIsMinted] = useState(false);
   const [nextTokenId, setNextTokenId] = useState(0);
   const [mintedNFTInfo, setMintedNFTInfo] = useState<MintedNFTInfo | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [setIsLoading] = useState(false);
 
   const { address, isConnected } = useAccount();
 
@@ -62,7 +62,6 @@ function App() {
     if (!isConnected || !address) return;
     
     setIsMinting(true);
-    setIsLoading(true);
     setMintStatus("Minting en cours...");
     setStatusType("connected");
     
@@ -104,7 +103,6 @@ function App() {
       setMintStatus("Une erreur est survenue lors du mint");
       setStatusType("error");
     } finally {
-      setIsLoading(false);
       setIsMinting(false);
     }
   };
