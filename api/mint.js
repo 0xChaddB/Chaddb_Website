@@ -50,9 +50,10 @@ function generateSVG(colors) {
     </svg>
   `;
 }
-
+console.log('✅ Initialisation de api/mint.js');
 // 🚀 **API Serverless Mint NFT**
 export default async function handler(req, res) {
+  console.log('✅ /api/mint appelé avec', req.body);
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Méthode non autorisée' });
   }

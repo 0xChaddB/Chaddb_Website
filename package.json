@@ -8,13 +8,15 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server": "cd server && npm start"
+    "server": "cd server && npm start",
+    "vercel-dev": "vercel dev"
   },
   "dependencies": {
     "@biconomy/account": "^4.5.7",
     "@helia/http": "^2.0.4",
     "@helia/json": "^4.0.2",
     "@openzeppelin/defender-relay-client": "^1.54.6",
+    "@pinata/sdk": "^2.1.0",
     "@rainbow-me/rainbowkit": "^2.2.4",
     "@tanstack/react-query": "^5.0.0",
     "dotenv": "^16.4.7",

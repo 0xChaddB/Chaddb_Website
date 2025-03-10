@@ -1,9 +1,16 @@
 {
+    "version": 2,
     "builds": [
-      { "src": "api/*.js", "use": "@vercel/node" }
+      {
+        "src": "api/mint.js",
+        "use": "@vercel/node"
+      }
     ],
     "routes": [
-      { "src": "/api/(.*)", "dest": "/api/$1" }
-    ]
+      {
+        "src": "/(.*)",
+        "dest": "api/mint.js"
+      }
+    ],
+    "buildCommand": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend"
   }
-  
