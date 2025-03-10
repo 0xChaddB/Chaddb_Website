@@ -860,3 +860,122 @@ footer {
     min-width: 50%; /* 2 projets */
   }
 }
+
+/* Styles pour les détails du NFT minté */
+.nft-minted-details {
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.nft-minted-title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(45deg, var(--glow), var(--glow-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nft-minted-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.nft-minted-link {
+  padding: 0.5rem 1rem;
+  color: #fff;
+  background: rgba(0, 255, 136, 0.2);
+  border: 1px solid var(--glow);
+  border-radius: 8px;
+  transition: all 0.3s;
+  text-decoration: none;
+}
+
+.nft-minted-link:hover {
+  background: rgba(0, 255, 136, 0.3);
+  transform: translateY(-2px);
+}
+
+.nft-preview-container {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.nft-preview-title {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.nft-preview-image-container {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.nft-preview-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.nft-preview-description {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1rem;
+}
+
+.nft-preview-attributes {
+  margin-top: 1rem;
+}
+
+.nft-preview-attributes h5 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.nft-preview-attributes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.5rem;
+}
+
+.nft-preview-attribute {
+  background: rgba(0, 255, 136, 0.1);
+  border-radius: 6px;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.nft-preview-attribute-name {
+  display: block;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.nft-preview-attribute-value {
+  font-size: 0.9rem;
+  color: var(--glow);
+}
+
+/* Styles pour le numéro de token */
+.nft-token-number {
+  color: var(--glow);
+  animation: pulse 1s ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}

@@ -125,7 +125,13 @@ export default async function handler(req, res) {
 
     console.log('✅ Transaction envoyée:', txResponse.transactionId);
 
-    return res.json({ success: true, txId: txResponse.transactionId, metadataURI });
+    return res.json({ 
+      success: true, 
+      txId: txResponse.transactionId, 
+      transactionHash: txResponse.hash || txResponse.transactionId, 
+      metadataURI,
+      tokenId: Number(tokenId)
+    });
   } catch (error) {
     console.error('❌ Erreur Minting:', error);
     return res.status(500).json({ error: 'Mint échoué', details: error.message });

@@ -5,6 +5,16 @@ import ProjectCarousel from './components/ProjectCarousel';
 import { techStackData } from './data/techStack';
 import AnimatedLogo from './components/AnimatedLogo';
 import NFTLogo from './components/NFTLogo';
+import NFTPreview from './components/NFTPreview';
+
+interface MintedNFTInfo {
+  transactionId: string;
+  transactionHash: string;
+  metadataURI: string;
+  tokenId: number;
+  openseaUrl: string;
+  blockExplorerUrl: string;
+}
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -13,8 +23,30 @@ function App() {
   const [statusType, setStatusType] = useState("");
   const [isMinting, setIsMinting] = useState(false);
   const [isMinted, setIsMinted] = useState(false);
+  const [nextTokenId, setNextTokenId] = useState(0);
+  const [mintedNFTInfo, setMintedNFTInfo] = useState<MintedNFTInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { address, isConnected } = useAccount();
+
+  useEffect(() => {
+    const fetchNextTokenId = async () => {
+      try {
+        const response = await fetch('/api/next-token-id');
+        const data = await response.json();
+        if (data.success) {
+          setNextTokenId(data.nextTokenId);
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération du nextTokenId:', error);
+      }
+    };
+    
+    fetchNextTokenId();
+    // Rafraîchir périodiquement
+    const interval = setInterval(fetchNextTokenId, 30000); // Toutes les 30 secondes
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (isConnected && address) {
@@ -27,19 +59,86 @@ function App() {
   }, [isConnected, address]);
 
   const handleMintNFT = async () => {
-    if (!isConnected) return;
+    if (!isConnected || !address) return;
+    
     setIsMinting(true);
-    setMintStatus("Minting in progress...");
+    setIsLoading(true);
+    setMintStatus("Minting en cours...");
     setStatusType("connected");
-    setTimeout(() => {
-      setMintStatus("Transaction submitted! Waiting for confirmation...");
-      setTimeout(() => {
-        setMintStatus("NFT successfully minted!");
+    
+    try {
+      // Appel à votre API pour minter le NFT
+      const response = await fetch('/api/mint', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ recipient: address }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setMintStatus("NFT minté avec succès!");
         setStatusType("success");
-        setIsMinting(false);
+        
+        // Stocker les informations du NFT minté
+        setMintedNFTInfo({
+          transactionId: data.txId,
+          transactionHash: data.transactionHash,
+          metadataURI: data.metadataURI,
+          tokenId: nextTokenId,
+          openseaUrl: `https://testnets.opensea.io/assets/polygon-amoy/${process.env.VITE_NFT_CONTRACT_ADDRESS}/${nextTokenId}`,
+          blockExplorerUrl: `https://www.oklink.com/fr/amoy/tx/${data.transactionHash}`
+        });
+        
+        // Incrémenter le prochain token ID
+        setNextTokenId(prev => prev + 1);
         setIsMinted(true);
-      }, 2000);
-    }, 1500);
+      } else {
+        setMintStatus(`Échec du mint: ${data.error}`);
+        setStatusType("error");
+      }
+    } catch (error) {
+      console.error('Erreur lors du mint:', error);
+      setMintStatus("Une erreur est survenue lors du mint");
+      setStatusType("error");
+    } finally {
+      setIsLoading(false);
+      setIsMinting(false);
+    }
+  };
+  const NFTMintedDetails = () => {
+    if (!mintedNFTInfo) return null;
+    
+    return (
+      <div className="nft-minted-details">
+        <h3 className="nft-minted-title">🎉 NFT Minté avec succès! 🎉</h3>
+        
+        <div className="nft-minted-links">
+          <a 
+            href={mintedNFTInfo.blockExplorerUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="nft-minted-link"
+          >
+            Voir la transaction
+          </a>
+          <a 
+            href={mintedNFTInfo.openseaUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="nft-minted-link"
+          >
+            Voir sur OpenSea
+          </a>
+        </div>
+        
+        <div className="nft-minted-preview">
+          <NFTPreview metadataURI={mintedNFTInfo.metadataURI} />
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -158,7 +257,12 @@ function App() {
               </div>
               <div className="nft-details">
                 <div>
-                  <h3 className="nft-name">Visitor Badge #001</h3>
+                <h3 className="nft-name">
+                  Visitor Badge #
+                  <span className="nft-token-number">
+                    {nextTokenId ? String(nextTokenId).padStart(3, '0') : '001'}
+                  </span>
+                </h3>
                   <p className="nft-info">This NFT changes color randomly at each mint, ensuring a unique NFT for everyone!</p>
                 </div>
                 <div className="nft-stats">
@@ -200,6 +304,9 @@ function App() {
                     className="button button-secondary mint-button"
                   >
                     {isMinting ? 'Minting...' : isMinted ? 'Minted ✓' : 'Mint NFT'}
+                    {isMinted && mintedNFTInfo && (
+                      <NFTMintedDetails />
+                    )}
                   </button>
                 </div>
               </div>
