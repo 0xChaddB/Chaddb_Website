@@ -302,7 +302,7 @@ function App() {
                 {isLoading && (
                   <div className="loading-spinner-container">
                     <div className="loading-spinner"></div>
-                    <span>Chargement...</span>
+                    <span>Loading...</span>
                   </div>
                 )}
                 
@@ -328,7 +328,20 @@ function App() {
       <footer>
         <p className="footer-text">© 2024 0xChaddB. All rights reserved.</p>
       </footer>
+
+      {/* Loading Popup */}
+      {isMinting && (
+        <div className="loading-popup">
+          <div className="loading-popup-content">
+            <div className="loading-spinner"></div>
+            <h3 className="loading-title">Minting in progress...</h3>
+            <p className="loading-text">Please wait for your NFT to be mint on the blockchain</p>
+          </div>
+        </div>
+      )}
     </>
+
+    
   );
 }
 
