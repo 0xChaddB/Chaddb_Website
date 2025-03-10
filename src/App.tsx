@@ -112,30 +112,39 @@ function App() {
     if (!mintedNFTInfo) return null;
     
     return (
-      <div className="nft-minted-details">
-        <h3 className="nft-minted-title">🎉 NFT Minté avec succès! 🎉</h3>
-        
-        <div className="nft-minted-links">
-          <a 
-            href={mintedNFTInfo.blockExplorerUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="nft-minted-link"
+      <div className="success-popup">
+        <div className="success-popup-content">
+          <button 
+            onClick={() => setIsMinted(false)} 
+            className="popup-close-button"
           >
-            Voir la transaction
-          </a>
-          <a 
-            href={mintedNFTInfo.openseaUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="nft-minted-link"
-          >
-            Voir sur OpenSea
-          </a>
-        </div>
-        
-        <div className="nft-minted-preview">
-          <NFTPreview metadataURI={mintedNFTInfo.metadataURI} />
+            ×
+          </button>
+          
+          <h3 className="nft-minted-title">🎉 NFT Minté avec succès! 🎉</h3>
+          
+          <div className="nft-minted-links">
+            <a 
+              href={mintedNFTInfo.blockExplorerUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="nft-minted-link"
+            >
+              Voir la transaction
+            </a>
+            <a 
+              href={mintedNFTInfo.openseaUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="nft-minted-link"
+            >
+              Voir sur OpenSea
+            </a>
+          </div>
+          
+          <div className="nft-minted-preview">
+            <NFTPreview metadataURI={mintedNFTInfo.metadataURI} />
+          </div>
         </div>
       </div>
     );
@@ -339,6 +348,8 @@ function App() {
           </div>
         </div>
       )}
+
+      {isMinted && mintedNFTInfo && <NFTMintedDetails />}
     </>
 
     
