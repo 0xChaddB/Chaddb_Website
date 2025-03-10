@@ -1,11 +1,15 @@
 {
-  "name": "package",
+  "name": "api",
   "version": "1.0.0",
   "main": "mint.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  "dependencies": {
+    "@pinata/sdk": "^2.1.0",
+    "@openzeppelin/defender-relay-client": "^1.54.6",
+    "dotenv": "^16.4.7",
+    "viem": "^2.23.8"
+  }
 }

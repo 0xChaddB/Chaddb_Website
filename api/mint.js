@@ -4,6 +4,9 @@ import { createPublicClient, encodeFunctionData, http } from 'viem';
 import { polygonAmoy } from 'viem/chains';
 import { Relayer } from '@openzeppelin/defender-relay-client';
 import { Readable } from 'stream';
+import { readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 
@@ -21,10 +24,12 @@ const publicClient = createPublicClient({
 // ✅ Charger l'ABI du contrat NFT
 let nftABI;
 try {
-  nftABI = JSON.parse(process.env.NFT_ABI);
-  console.log('✅ ABI chargé depuis env');
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  const abiPath = join(__dirname, 'nftABI.json');
+  nftABI = JSON.parse(readFileSync(abiPath, 'utf8'));
+  console.log('✅ ABI chargé depuis le fichier nftABI.json');
 } catch (error) {
-  console.error('❌ Erreur de parsing de l’ABI:', error.message);
+  console.error('❌ Erreur de chargement de l\'ABI:', error.message);
   process.exit(1);
 }
 
