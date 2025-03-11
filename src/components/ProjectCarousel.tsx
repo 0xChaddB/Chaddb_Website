@@ -7,7 +7,7 @@ const ProjectCarousel = () => {
   const [visibleProjects, setVisibleProjects] = useState(2);
   const carouselRef = useRef<HTMLDivElement>(null);
 
-  // Gestion responsive
+  //  responsive
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -27,53 +27,36 @@ const ProjectCarousel = () => {
     }
   }, [visibleProjects]);
 
-  // Calcul du nombre total de groupes
+  // grp number calcul
   const totalGroups = Math.ceil(projectsData.length / visibleProjects) || 1;
-  // Ajustement pour desktop avec 4 projets
-  const isDesktopWithExtra = window.innerWidth >= 1024 && projectsData.length === 4;
-  const adjustedTotalGroups = isDesktopWithExtra ? 2 : totalGroups;
 
-  // Défilement vers le groupe suivant
+  // next
   const next = useCallback(() => {
     if (!carouselRef.current) return;
     const itemWidth = carouselRef.current.scrollWidth / projectsData.length;
-    const newGroup = Math.min(currentGroup + 1, adjustedTotalGroups - 1);
-    
-    let newScrollLeft;
-    if (isDesktopWithExtra && newGroup === 1) {
-      // Dernier projet (4e) prend toute la largeur sur desktop
-      newScrollLeft = 3 * itemWidth; // Position après les 3 premiers projets
-    } else {
-      newScrollLeft = newGroup * visibleProjects * itemWidth;
-    }
-    
+    const newGroup = Math.min(currentGroup + 1, totalGroups - 1);
+    const newScrollLeft = newGroup * visibleProjects * itemWidth;
     carouselRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
     setCurrentGroup(newGroup);
-  }, [currentGroup, visibleProjects, adjustedTotalGroups, isDesktopWithExtra]);
+  }, [currentGroup, visibleProjects, totalGroups]);
 
-  // Défilement vers le groupe précédent
+  // previous
   const prev = useCallback(() => {
     if (!carouselRef.current) return;
     const itemWidth = carouselRef.current.scrollWidth / projectsData.length;
     const newGroup = Math.max(currentGroup - 1, 0);
     const newScrollLeft = newGroup * visibleProjects * itemWidth;
-    
     carouselRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
     setCurrentGroup(newGroup);
   }, [currentGroup, visibleProjects]);
 
-  // Synchronisation de l’index avec le défilement manuel
+  // Index synchro
   useEffect(() => {
     const handleScroll = () => {
       if (!carouselRef.current) return;
       const scrollLeft = carouselRef.current.scrollLeft;
       const itemWidth = carouselRef.current.scrollWidth / projectsData.length;
-      let newGroup;
-      if (isDesktopWithExtra && scrollLeft >= 3 * itemWidth) {
-        newGroup = 1;
-      } else {
-        newGroup = Math.round(scrollLeft / (itemWidth * visibleProjects));
-      }
+      const newGroup = Math.round(scrollLeft / (itemWidth * visibleProjects));
       setCurrentGroup(newGroup);
     };
 
@@ -82,43 +65,46 @@ const ProjectCarousel = () => {
       carousel.addEventListener('scroll', handleScroll);
       return () => carousel.removeEventListener('scroll', handleScroll);
     }
-  }, [visibleProjects, isDesktopWithExtra]);
+  }, [visibleProjects]);
 
-
-  // Aller à un groupe spécifique via les dots
+  // dot group
   const goToGroup = useCallback((groupIndex: number) => {
     if (!carouselRef.current) return;
     const itemWidth = carouselRef.current.scrollWidth / projectsData.length;
-    let newScrollLeft;
-    if (isDesktopWithExtra && groupIndex === 1) {
-      newScrollLeft = 3 * itemWidth; // Position du 4e projet
-    } else {
-      newScrollLeft = groupIndex * visibleProjects * itemWidth;
-    }
+    const newScrollLeft = groupIndex * visibleProjects * itemWidth;
     carouselRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
     setCurrentGroup(groupIndex);
-  }, [visibleProjects, isDesktopWithExtra]);
+  }, [visibleProjects]);
+
+  // keyboard nav
+  const handleKeyDown = (e: React.KeyboardEvent, action: 'prev' | 'next') => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (action === 'prev') prev();
+      else next();
+    }
+  };
 
   return (
-    <section id="projects" className="section section-dark" role="region" aria-label="Featured Projects Carousel">
+    <section id="projects" className="section section-dark" role="region" aria-label="Project Carousel">
       <div className="section-content">
         <h2 className="section-title">Featured Projects</h2>
         <p className="section-subtitle">Here are some of my recent works in the Web3 space.</p>
-        
         <div className="carousel-container">
-          <button 
-            className="carousel-button carousel-button-prev" 
+          <button
+            className="carousel-button carousel-button-prev"
             onClick={prev}
+            onKeyDown={(e) => handleKeyDown(e, 'prev')}
             disabled={currentGroup === 0}
-            aria-label="Previous project group"
+            aria-label="Groupe de projets précédent"
+            tabIndex={0}
           >
             ❮
           </button>
-          
           <div className="carousel-content-wrapper">
-            <div ref={carouselRef} className="carousel-content">
-              {projectsData.map(project => (
-                <div key={project.id} className="carousel-item">
+            <div ref={carouselRef} className="carousel-content" role="list">
+              {projectsData.map((project) => (
+                <div key={project.id} className="carousel-item" role="listitem">
                   <ProjectCard
                     id={project.id}
                     title={project.title}
@@ -130,24 +116,26 @@ const ProjectCarousel = () => {
               ))}
             </div>
           </div>
-          
-          <button 
-            className="carousel-button carousel-button-next" 
+          <button
+            className="carousel-button carousel-button-next"
             onClick={next}
-            disabled={currentGroup === adjustedTotalGroups - 1}
+            onKeyDown={(e) => handleKeyDown(e, 'next')}
+            disabled={currentGroup === totalGroups - 1}
             aria-label="Next project group"
+            tabIndex={0}
           >
             ❯
           </button>
         </div>
-        
-        <div className="carousel-dots">
-          {Array.from({ length: adjustedTotalGroups }).map((_, index) => (
+        <div className="carousel-dots" role="navigation" aria-label="Dot nav carousel">
+          {Array.from({ length: totalGroups }).map((_, index) => (
             <button
               key={`dot-${index}`}
               className={`carousel-dot ${index === currentGroup ? 'active' : ''}`}
               onClick={() => goToGroup(index)}
               aria-label={`Go to project group ${index + 1}`}
+              aria-current={index === currentGroup ? 'true' : 'false'}
+              tabIndex={0}
             />
           ))}
         </div>

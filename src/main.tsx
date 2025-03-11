@@ -15,10 +15,10 @@ import './index.css';
 
 const config = getDefaultConfig({
   appName: '0xChaddB Portfolio',
-  projectId: '3ddaf49536fb377e34291bc7dd575f95', // Ton WalletConnect project ID
-  chains: [polygon], // Mainnet Polygon
+  projectId: '3ddaf49536fb377e34291bc7dd575f95',
+  chains: [polygon], //
   transports: {
-    [polygon.id]: http('https://polygon-mainnet.infura.io/v3/ede8136edbb24fe0b2c5194483b8d6ed'), // Ton API key
+    [polygon.id]: http('https://polygon-mainnet.infura.io/v3/ede8136edbb24fe0b2c5194483b8d6ed'), 
   },
 });
 
