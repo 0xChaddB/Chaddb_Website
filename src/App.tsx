@@ -42,6 +42,7 @@ function App() {
     };
     
     fetchNextTokenId();
+    // Rafraîchir périodiquement
     const interval = setInterval(fetchNextTokenId, 30000); // Toutes les 30 secondes
     return () => clearInterval(interval);
   }, []);
@@ -64,6 +65,7 @@ function App() {
     setStatusType("connected");
     
     try {
+      // Appel à votre API pour minter le NFT
       const response = await fetch('/api/mint', {
         method: 'POST',
         headers: {
@@ -75,9 +77,10 @@ function App() {
       const data = await response.json();
       
       if (data.success) {
-        setMintStatus("NFT minté avec succès!");
+        setMintStatus("NFT minted!");
         setStatusType("success");
         
+        // Stocker les informations du NFT minté
         setMintedNFTInfo({
           transactionId: data.txId,
           transactionHash: data.transactionHash,
@@ -87,6 +90,7 @@ function App() {
           blockExplorerUrl: `https://www.oklink.com/fr/amoy/tx/${data.transactionHash}`
         });
         
+        // Incrémenter le prochain token ID
         setNextTokenId(prev => prev + 1);
         setIsMinted(true);
       } else {
@@ -101,7 +105,6 @@ function App() {
       setIsMinting(false);
     }
   };
-
   const NFTMintedDetails = () => {
     if (!mintedNFTInfo) return null;
     
@@ -114,7 +117,9 @@ function App() {
           >
             ×
           </button>
-          <h3 className="nft-minted-title">🎉 NFT Minté avec succès! 🎉</h3>
+          
+          <h3 className="nft-minted-title">NFT minted successfully!</h3>
+          
           <div className="nft-minted-links">
             <a 
               href={mintedNFTInfo.blockExplorerUrl} 
@@ -133,6 +138,7 @@ function App() {
               Voir sur OpenSea
             </a>
           </div>
+          
           <div className="nft-minted-preview">
             <NFTPreview metadataURI={mintedNFTInfo.metadataURI} />
           </div>
@@ -230,7 +236,7 @@ function App() {
           <p className="section-subtitle">Technologies and tools I specialize in.</p>
           <div className="tech-grid">
             {techStackData.map((tech, index) => {
-              const IconComponent = tech.icon;
+              const IconComponent = tech.icon; 
               return (
                 <div key={index} className="tech-card">
                   <IconComponent className="tech-icon" />
@@ -257,12 +263,12 @@ function App() {
               </div>
               <div className="nft-details">
                 <div>
-                  <h3 className="nft-name">
-                    Visitor Badge #
-                    <span className="nft-token-number">
-                      {nextTokenId ? String(nextTokenId).padStart(3, '0') : '001'}
-                    </span>
-                  </h3>
+                <h3 className="nft-name">
+                  Visitor Badge #
+                  <span className="nft-token-number">
+                    {nextTokenId ? String(nextTokenId).padStart(3, '0') : '001'}
+                  </span>
+                </h3>
                   <p className="nft-info">This NFT changes color randomly at each mint, ensuring a unique NFT for everyone!</p>
                 </div>
                 <div className="nft-stats">
@@ -277,35 +283,37 @@ function App() {
                 </div>
                 <div id="mint-status" className={`mint-status ${statusType}`}>{mintStatus}</div>
                 <div className="mint-controls">
-                  <ConnectButton.Custom>
-                    {({
-                      account,
-                      chain,
-                      openAccountModal,
-                      openConnectModal,
-                      mounted,
-                    }) => {
-                      const ready = mounted;
-                      const connected = ready && account && chain;
-                      return (
-                        <button
-                          onClick={connected ? openAccountModal : openConnectModal}
-                          type="button"
-                          className="button button-primary mint-button"
-                        >
-                          {connected ? `${account.displayName}` : "Connect Wallet"}
-                        </button>
-                      );
-                    }}
-                  </ConnectButton.Custom>
-                  <button
-                    onClick={handleMintNFT}
-                    disabled={!isConnected || isMinting || isMinted}
-                    className="button button-secondary mint-button"
-                  >
-                    {isMinting ? 'Minting...' : isMinted ? 'Minted ✓' : 'Mint NFT'}
-                  </button>
-                </div>
+                <ConnectButton.Custom>
+                  {({
+                    account,
+                    chain,
+                    openAccountModal,
+                    openConnectModal,
+                    mounted,
+                  }) => {
+                    const ready = mounted;
+                    const connected = ready && account && chain;
+                    return (
+                      <button
+                        onClick={connected ? openAccountModal : openConnectModal}
+                        type="button"
+                        className="button button-primary mint-button"
+                      >
+                        {connected ? `${account.displayName}` : "Connect Wallet"}
+                      </button>
+                    );
+                  }}
+                </ConnectButton.Custom>
+                
+                <button
+                  onClick={handleMintNFT}
+                  disabled={!isConnected || isMinting || isMinted}
+                  className="button button-secondary mint-button"
+                >
+                  {isMinting ? 'Minting...' : isMinted ? 'Minted ✓' : 'Mint NFT'}
+                </button>
+            
+              </div>
               </div>
             </div>
           </div>
@@ -330,6 +338,8 @@ function App() {
 
       {isMinted && mintedNFTInfo && <NFTMintedDetails />}
     </>
+
+    
   );
 }
 
