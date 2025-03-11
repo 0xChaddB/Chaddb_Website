@@ -1,4 +1,10 @@
-import { ProjectCardProps } from '../components/ProjectCard';
+export interface ProjectCardProps {
+  id: string;
+  title: string;
+  tags: string[];
+  description: string;
+  link?: string;
+}
 
 export const projectsData: ProjectCardProps[] = [
   {
@@ -15,7 +21,6 @@ export const projectsData: ProjectCardProps[] = [
     description: "Decentralized NFT marketplace with advanced trading features and cross-chain compatibility.",
     link: "https://github.com/0xChaddB/ChadVault"
   },
-
   {
     id: "portfolio-dashboard",
     title: "Portfolio Dashboard",
@@ -23,14 +28,11 @@ export const projectsData: ProjectCardProps[] = [
     description: "Web3 portfolio tracker with real-time price updates and customizable asset visualization.",
     link: undefined
   },
-
   {
     id: "incoming-projects",
     title: "Cooking some projects...",
     tags: ["Be ready", "Hold your breath", "It's going to blow"],
-    description: "More projects incoming... ",
+    description: "More projects incoming...",
     link: undefined
   },
-
-  // MORE PROJECTS COMING SOOOOOOON
 ];
