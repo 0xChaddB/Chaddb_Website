@@ -25,7 +25,6 @@ function App() {
   const [isMinted, setIsMinted] = useState(false);
   const [nextTokenId, setNextTokenId] = useState(0);
   const [mintedNFTInfo, setMintedNFTInfo] = useState<MintedNFTInfo | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const { address, isConnected } = useAccount();
 
@@ -43,7 +42,6 @@ function App() {
     };
     
     fetchNextTokenId();
-    // Rafraîchir périodiquement
     const interval = setInterval(fetchNextTokenId, 30000); // Toutes les 30 secondes
     return () => clearInterval(interval);
   }, []);
@@ -62,12 +60,10 @@ function App() {
     if (!isConnected || !address) return;
     
     setIsMinting(true);
-    setIsLoading(true);
     setMintStatus("Minting en cours...");
     setStatusType("connected");
     
     try {
-      // Appel à votre API pour minter le NFT
       const response = await fetch('/api/mint', {
         method: 'POST',
         headers: {
@@ -82,7 +78,6 @@ function App() {
         setMintStatus("NFT minté avec succès!");
         setStatusType("success");
         
-        // Stocker les informations du NFT minté
         setMintedNFTInfo({
           transactionId: data.txId,
           transactionHash: data.transactionHash,
@@ -92,7 +87,6 @@ function App() {
           blockExplorerUrl: `https://www.oklink.com/fr/amoy/tx/${data.transactionHash}`
         });
         
-        // Incrémenter le prochain token ID
         setNextTokenId(prev => prev + 1);
         setIsMinted(true);
       } else {
@@ -105,9 +99,9 @@ function App() {
       setStatusType("error");
     } finally {
       setIsMinting(false);
-      setIsLoading(false);
     }
   };
+
   const NFTMintedDetails = () => {
     if (!mintedNFTInfo) return null;
     
@@ -120,9 +114,7 @@ function App() {
           >
             ×
           </button>
-          
           <h3 className="nft-minted-title">🎉 NFT Minté avec succès! 🎉</h3>
-          
           <div className="nft-minted-links">
             <a 
               href={mintedNFTInfo.blockExplorerUrl} 
@@ -141,7 +133,6 @@ function App() {
               Voir sur OpenSea
             </a>
           </div>
-          
           <div className="nft-minted-preview">
             <NFTPreview metadataURI={mintedNFTInfo.metadataURI} />
           </div>
@@ -239,7 +230,7 @@ function App() {
           <p className="section-subtitle">Technologies and tools I specialize in.</p>
           <div className="tech-grid">
             {techStackData.map((tech, index) => {
-              const IconComponent = tech.icon; // Récupère le composant d’icône
+              const IconComponent = tech.icon;
               return (
                 <div key={index} className="tech-card">
                   <IconComponent className="tech-icon" />
@@ -266,12 +257,12 @@ function App() {
               </div>
               <div className="nft-details">
                 <div>
-                <h3 className="nft-name">
-                  Visitor Badge #
-                  <span className="nft-token-number">
-                    {nextTokenId ? String(nextTokenId).padStart(3, '0') : '001'}
-                  </span>
-                </h3>
+                  <h3 className="nft-name">
+                    Visitor Badge #
+                    <span className="nft-token-number">
+                      {nextTokenId ? String(nextTokenId).padStart(3, '0') : '001'}
+                    </span>
+                  </h3>
                   <p className="nft-info">This NFT changes color randomly at each mint, ensuring a unique NFT for everyone!</p>
                 </div>
                 <div className="nft-stats">
@@ -286,47 +277,35 @@ function App() {
                 </div>
                 <div id="mint-status" className={`mint-status ${statusType}`}>{mintStatus}</div>
                 <div className="mint-controls">
-                <ConnectButton.Custom>
-                  {({
-                    account,
-                    chain,
-                    openAccountModal,
-                    openConnectModal,
-                    mounted,
-                  }) => {
-                    const ready = mounted;
-                    const connected = ready && account && chain;
-                    return (
-                      <button
-                        onClick={connected ? openAccountModal : openConnectModal}
-                        type="button"
-                        className="button button-primary mint-button"
-                      >
-                        {connected ? `${account.displayName}` : "Connect Wallet"}
-                      </button>
-                    );
-                  }}
-                </ConnectButton.Custom>
-                
-                {isLoading && (
-                  <div className="loading-spinner-container">
-                    <div className="loading-spinner"></div>
-                    <span>Loading...</span>
-                  </div>
-                )}
-                
-                <button
-                  onClick={handleMintNFT}
-                  disabled={!isConnected || isMinting || isMinted}
-                  className="button button-secondary mint-button"
-                >
-                  {isMinting ? 'Minting...' : isMinted ? 'Minted ✓' : 'Mint NFT'}
-                </button>
-                
-                {isMinted && mintedNFTInfo && (
-                  <NFTMintedDetails />
-                )}
-              </div>
+                  <ConnectButton.Custom>
+                    {({
+                      account,
+                      chain,
+                      openAccountModal,
+                      openConnectModal,
+                      mounted,
+                    }) => {
+                      const ready = mounted;
+                      const connected = ready && account && chain;
+                      return (
+                        <button
+                          onClick={connected ? openAccountModal : openConnectModal}
+                          type="button"
+                          className="button button-primary mint-button"
+                        >
+                          {connected ? `${account.displayName}` : "Connect Wallet"}
+                        </button>
+                      );
+                    }}
+                  </ConnectButton.Custom>
+                  <button
+                    onClick={handleMintNFT}
+                    disabled={!isConnected || isMinting || isMinted}
+                    className="button button-secondary mint-button"
+                  >
+                    {isMinting ? 'Minting...' : isMinted ? 'Minted ✓' : 'Mint NFT'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -344,15 +323,13 @@ function App() {
           <div className="loading-popup-content">
             <div className="loading-spinner"></div>
             <h3 className="loading-title">Minting in progress...</h3>
-            <p className="loading-text">Please wait for your NFT to be mint on the blockchain</p>
+            <p className="loading-text">Please wait for your NFT to be minted on the blockchain</p>
           </div>
         </div>
       )}
 
       {isMinted && mintedNFTInfo && <NFTMintedDetails />}
     </>
-
-    
   );
 }
 
