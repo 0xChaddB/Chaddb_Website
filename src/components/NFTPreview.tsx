@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface NFTPreviewProps {
   metadataURI: string;
@@ -8,72 +8,63 @@ const NFTPreview: React.FC<NFTPreviewProps> = ({ metadataURI }) => {
   const [metadata, setMetadata] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const fetchMetadata = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const ipfsGatewayUrl = metadataURI.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/');
-      const response = await fetch(ipfsGatewayUrl, { signal: AbortSignal.timeout(10000) }); // Timeout 10s
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP ${response.status}`);
-      }
-      const data = await response.json();
-      if (!data.name || !data.image) {
-        throw new Error('Métadonnées incomplètes');
-      }
-      setMetadata(data);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      console.error('Error loading metadata:', err);
-      setError(`Can't upload metadata: ${message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [metadataURI]);
-
+  
   useEffect(() => {
+    const fetchMetadata = async () => {
+      try {
+        setIsLoading(true);
+        // Convertir IPFS URI en HTTP pour récupérer les données
+        const ipfsGatewayUrl = metadataURI.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/');
+        
+        const response = await fetch(ipfsGatewayUrl);
+        if (!response.ok) {
+          throw new Error('Impossible de récupérer les métadonnées');
+        }
+        
+        const data = await response.json();
+        setMetadata(data);
+      } catch (err) {
+        console.error('Erreur de chargement des métadonnées:', err);
+        setError('Impossible de charger les métadonnées du NFT');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
     if (metadataURI) {
       fetchMetadata();
     }
-  }, [metadataURI, fetchMetadata]);
-
+  }, [metadataURI]);
+  
   if (isLoading) {
-    return (
-      <div className="nft-preview-loading" aria-live="polite">
-        Loading preview...
-      </div>
-    );
+    return <div className="nft-preview-loading">Chargement de la prévisualisation...</div>;
   }
-
+  
   if (error || !metadata) {
-    return (
-      <div className="nft-preview-error" aria-live="assertive">
-        {error || "Impossible de charger l'aperçu du NFT"}
-      </div>
-    );
+    return <div className="nft-preview-error">Impossible de charger l'aperçu du NFT</div>;
   }
-
+  
+  // Convertir l'URI de l'image en URL HTTP
   const imageUrl = metadata.image?.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/');
-
+  
   return (
-    <div className="nft-preview-container" role="region" aria-label={`NFT Preview ${metadata.name}`}>
+    <div className="nft-preview-container">
       <h4 className="nft-preview-title">{metadata.name}</h4>
       {imageUrl && (
         <div className="nft-preview-image-container">
-          <img
-            src={imageUrl}
-            alt={`NFT image ${metadata.name}`}
-            className="nft-preview-image"
+          <img 
+            src={imageUrl} 
+            alt={metadata.name} 
+            className="nft-preview-image" 
             onError={(e) => {
-              e.currentTarget.src = '/images/LogoRecolored.jpg';
-              e.currentTarget.alt = `Image available for ${metadata.name}`;
+              // Fallback en cas d'erreur de chargement d'image
+              e.currentTarget.src = '/images/nft-placeholder.png';
             }}
-            loading="lazy"
           />
         </div>
       )}
       <p className="nft-preview-description">{metadata.description}</p>
+      
       {metadata.attributes && metadata.attributes.length > 0 && (
         <div className="nft-preview-attributes">
           <h5>Attributs</h5>

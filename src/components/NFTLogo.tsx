@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface NFTLogoProps extends React.SVGProps<SVGSVGElement> {}
 
+// Fonction pour générer une couleur hexadécimale aléatoire
 const generateRandomColor = (): string => {
   const letters = '0123456789ABCDEF';
   let color = '#';
@@ -13,20 +14,23 @@ const generateRandomColor = (): string => {
 
 const NFTLogo: React.FC<NFTLogoProps> = (props) => {
   const [pathColors, setPathColors] = useState<string[]>([
-    generateRandomColor(),
-    generateRandomColor(),
-    generateRandomColor(),
-    generateRandomColor(),
+    generateRandomColor(), // Couleur initiale aléatoire pour path 1
+    generateRandomColor(), // Path 2
+    generateRandomColor(), // Path 3
+    generateRandomColor(), // Path 4
   ]);
 
-  const handleHover = () => {
-    setPathColors([
-      generateRandomColor(),
-      generateRandomColor(),
-      generateRandomColor(),
-      generateRandomColor(),
-    ]);
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPathColors([
+        generateRandomColor(), // Nouvelle couleur aléatoire pour path 1
+        generateRandomColor(), // Path 2
+        generateRandomColor(), // Path 3
+        generateRandomColor(), // Path 4
+      ]);
+    }, 3000); // Change toutes les 3 secondes
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <svg
@@ -35,7 +39,6 @@ const NFTLogo: React.FC<NFTLogoProps> = (props) => {
       width="834.6801"
       height="950"
       {...props}
-      onMouseEnter={handleHover}
     >
       <path
         className="logo-path"
