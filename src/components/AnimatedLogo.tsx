@@ -5,6 +5,8 @@ const AnimatedLogo: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 834.6801 950"
+      width="834.6801" // Taille par défaut restaurée
+      height="950"
       {...props}
       aria-hidden="true"
     >
