@@ -18,7 +18,7 @@ const relayer = new Relayer({
 });
 const publicClient = createPublicClient({
   chain: polygonAmoy,
-  transport: http(process.env.RPC_URL),
+  transport: http(process.env.VITE_RPC_URL),
 });
 
 // ✅ Charger l'ABI du contrat NFT

@@ -18,7 +18,7 @@ try {
 // Initialiser le client public
 const publicClient = createPublicClient({
   chain: polygonAmoy,
-  transport: http(process.env.RPC_URL),
+  transport: http(process.env.VITE_RPC_URL),
 });
 
 export default async function handler(req, res) {

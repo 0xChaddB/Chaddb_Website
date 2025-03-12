@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { WagmiProvider } from 'wagmi';
-import { polygon } from 'wagmi/chains'; // Mainnet Polygon
+import { polygon } from 'wagmi/chains';
 import { http } from 'viem';
 import {
   RainbowKitProvider,
@@ -15,16 +15,20 @@ import './index.css';
 
 const config = getDefaultConfig({
   appName: '0xChaddB Portfolio',
-  projectId: '3ddaf49536fb377e34291bc7dd575f95', // Ton WalletConnect project ID
-  chains: [polygon], // Mainnet Polygon
+  projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID, // From env
+  chains: [polygon],
   transports: {
-    [polygon.id]: http('https://polygon-mainnet.infura.io/v3/ede8136edbb24fe0b2c5194483b8d6ed'), // Ton API key
+    [polygon.id]: http(import.meta.env.VITE_RPC_URL), // From env
   },
 });
 
 const queryClient = new QueryClient();
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+// Safe way to get root element
+const rootElement = document.getElementById('root');
+if (!rootElement) throw new Error('Failed to find the root element');
+
+ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <WagmiProvider config={config}>
