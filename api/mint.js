@@ -58,82 +58,191 @@ function generateSVG(colors) {
 console.log('✅ Initialisation de api/mint.js');
 // 🚀 **API Serverless Mint NFT**
 export default async function handler(req, res) {
-  console.log('✅ /api/mint appelé avec', req.body);
+  console.log('✅ /api/mint called with', req.body);
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Méthode non autorisée' });
+    return res.status(405).json({ 
+      success: false,
+      error: 'Method non-authorized',
+      errorCode: 'METHOD_NOT_ALLOWED',
+      details: `Method ${req.method} non-supported. Only POST requests accepted.`
+    });
   }
 
   try {
     const { recipient } = req.body;
-    if (!recipient) return res.status(400).json({ error: 'Recipient requis' });
+    if (!recipient) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Missing recipient address',
+        errorCode: 'MISSING_RECIPIENT',
+        details: 'Recipient address required for mint.'
+      });
+    }
 
-    console.log('🔍 Minting NFT pour', recipient);
+    // Validation de l'adresse Ethereum (format basique)
+    if (!/^0x[a-fA-F0-9]{40}$/.test(recipient)) {
+      return res.status(400).json({
+        success: false, 
+        error: 'Invalid Ethereum Address',
+        errorCode: 'INVALID_ADDRESS',
+        details: 'Invalid format address.'
+      });
+    }
 
-    // ✅ Générer un SVG avec couleurs random
-    const colors = generateRandomColors();
-    const svgImage = generateSVG(colors);
+    console.log('🔍 Minting NFT for', recipient);
 
-    // ✅ Envoyer le SVG directement sur Pinata sans stockage disque
-    const imageResponse = await pinata.pinFileToIPFS(Readable.from(svgImage), {
-      pinataMetadata: { name: `nft-${Date.now()}.svg` },
-      pinataOptions: { cidVersion: 0 },
-    });
+    try {
+      // ✅ Generate SVG with random colors
+      const colors = generateRandomColors();
+      const svgImage = generateSVG(colors);
+      
+      // ✅ Send the SVG on pinata
+      let imageResponse;
+      try {
+        imageResponse = await pinata.pinFileToIPFS(Readable.from(svgImage), {
+          pinataMetadata: { name: `nft-${Date.now()}.svg` },
+          pinataOptions: { cidVersion: 0 },
+        });
+      } catch (pinataError) {
+        console.error('❌ Error Pinata (image):', pinataError);
+        throw {
+          message: 'Fail storing image on IPFS',
+          errorCode: 'IPFS_IMAGE_UPLOAD_FAILED',
+          details: pinataError.message,
+          original: pinataError
+        };
+      }
 
-    const imageURI = `ipfs://${imageResponse.IpfsHash}`;
-    console.log('✅ Image stockée sur IPFS:', imageURI);
+      const imageURI = `ipfs://${imageResponse.IpfsHash}`;
+      console.log('✅ Image sent on IPFS:', imageURI);
 
-    // ✅ Calculer le Token ID
-    const totalMinted = await publicClient.readContract({
-      address: process.env.NFT_CONTRACT_ADDRESS,
-      abi: nftABI,
-      functionName: 'totalMinted',
-    });
-    const tokenId = BigInt(totalMinted) + BigInt(1);
-    console.log('✅ Token ID calculé:', Number(tokenId));
+      // ✅ Calculate Token ID
+      let totalMinted;
+      try {
+        totalMinted = await publicClient.readContract({
+          address: process.env.NFT_CONTRACT_ADDRESS,
+          abi: nftABI,
+          functionName: 'totalMinted',
+        });
+      } catch (contractReadError) {
+        console.error('❌ Error reading contract:', contractReadError);
+        throw {
+          message: 'Cant read totalMinted NFT',
+          errorCode: 'CONTRACT_READ_ERROR',
+          details: contractReadError.message,
+          original: contractReadError
+        };
+      }
+      
+      const tokenId = BigInt(totalMinted) + BigInt(1);
+      console.log('✅ Token ID calculated:', Number(tokenId));
 
-    // ✅ Générer les métadonnées du NFT
-    const metadata = {
-      name: `Visitor Badge #${tokenId}`,
-      description: "An exclusive NFT proving you visited 0xChaddB's portfolio.",
-      image: imageURI,
-      attributes: [
-        { trait_type: 'Path 1 Color', value: colors.path1 },
-        { trait_type: 'Path 2 Color', value: colors.path2 },
-        { trait_type: 'Path 3 Color', value: colors.path3 },
-        { trait_type: 'Path 4 Color', value: colors.path4 },
-      ],
-    };
+      // ✅ Generating metadata NFT
+      const metadata = {
+        name: `Visitor Badge #${tokenId}`,
+        description: "An exclusive NFT proving you visited 0xChaddB's portfolio.",
+        image: imageURI,
+        attributes: [
+          { trait_type: 'Path 1 Color', value: colors.path1 },
+          { trait_type: 'Path 2 Color', value: colors.path2 },
+          { trait_type: 'Path 3 Color', value: colors.path3 },
+          { trait_type: 'Path 4 Color', value: colors.path4 },
+        ],
+      };
 
-    // ✅ Uploader les métadonnées sur Pinata
-    const metadataResponse = await pinata.pinJSONToIPFS(metadata);
-    const metadataURI = `ipfs://${metadataResponse.IpfsHash}`;
-    console.log('✅ Métadonnées stockées sur IPFS:', metadataURI);
+      // ✅ Uploading on Pinata
+      let metadataResponse;
+      try {
+        metadataResponse = await pinata.pinJSONToIPFS(metadata);
+      } catch (pinataMetadataError) {
+        console.error('❌ Pinata error (metadata):', pinataMetadataError);
+        throw {
+          message: 'Failed storing metadata on IPFS',
+          errorCode: 'IPFS_METADATA_UPLOAD_FAILED',
+          details: pinataMetadataError.message,
+          original: pinataMetadataError
+        };
+      }
+      
+      const metadataURI = `ipfs://${metadataResponse.IpfsHash}`;
+      console.log('✅ Metadata stored on IPFS', metadataURI);
 
-    // ✅ Construire la transaction pour OpenZeppelin Defender
-    const functionData = encodeFunctionData({
-      abi: nftABI,
-      functionName: 'entryMint',
-      args: [recipient, metadataURI],
-    });
+      // ✅ Building OZ Defender tx
+      let functionData;
+      try {
+        functionData = encodeFunctionData({
+          abi: nftABI,
+          functionName: 'entryMint',
+          args: [recipient, metadataURI],
+        });
+      } catch (encodeError) {
+        console.error('❌ Error encoding tx:', encodeError);
+        throw {
+          message: 'Failing encoding tx details',
+          errorCode: 'ENCODE_DATA_ERROR',
+          details: encodeError.message,
+          original: encodeError
+        };
+      }
 
-    const txResponse = await relayer.sendTransaction({
-      to: process.env.NFT_CONTRACT_ADDRESS,
-      data: functionData,
-      gasLimit: 500000,
-      speed: 'fast',
-    });
+      let txResponse;
+      try {
+        txResponse = await relayer.sendTransaction({
+          to: process.env.NFT_CONTRACT_ADDRESS,
+          data: functionData,
+          gasLimit: 500000,
+          speed: 'fast',
+        });
+      } catch (txError) {
+        console.error('❌ Error sending transaction:', txError);
+        
+        // Looking for NFT owning in recipient address
+        if (txError.message && txError.message.includes('VisitorNFT__CantOwnMoreThanOne')) {
+          throw {
+            message: 'You already own a NFT from this collection',
+            errorCode: 'ALREADY_OWNS_NFT',
+            details: 'Only one NFT of this collection is authorized per address',
+            original: txError
+          };
+        }
+        
+        throw {
+          message: 'Échec de la transaction',
+          errorCode: 'TRANSACTION_FAILED',
+          details: txError.message,
+          original: txError
+        };
+      }
 
-    console.log('✅ Transaction envoyée:', txResponse.transactionId);
+      console.log('✅ Transaction sent:', txResponse.transactionId);
 
-    return res.json({ 
-      success: true, 
-      txId: txResponse.transactionId, 
-      transactionHash: txResponse.hash || txResponse.transactionId, 
-      metadataURI,
-      tokenId: Number(tokenId)
-    });
+      return res.json({ 
+        success: true, 
+        txId: txResponse.transactionId, 
+        transactionHash: txResponse.hash || txResponse.transactionId, 
+        metadataURI,
+        tokenId: Number(tokenId)
+      });
+      
+    } catch (processingError) {
+      // Catch error when processing minting
+      console.error('❌ Processing error:', processingError);
+      return res.status(500).json({
+        success: false,
+        error: processingError.message || 'Unknown processing error',
+        errorCode: processingError.errorCode || 'PROCESSING_ERROR',
+        details: processingError.details || 'Error while processing minting',
+      });
+    }
+    
   } catch (error) {
-    console.error('❌ Erreur Minting:', error);
-    return res.status(500).json({ error: 'Mint échoué', details: error.message });
+    // Catch general errors
+    console.error('❌ General Minting Error:', error);
+    return res.status(500).json({ 
+      success: false,
+      error: 'Mint failed', 
+      errorCode: 'GENERAL_ERROR',
+      details: error.message || 'An unexpected error occured'
+    });
   }
 }
