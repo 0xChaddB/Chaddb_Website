@@ -119,7 +119,7 @@ function App() {
             ×
           </button>
           
-          <h3 className="nft-minted-title">🎉 NFT Minté avec succès! 🎉</h3>
+          <h3 className="nft-minted-title">🎉 NFT Minted successfuly! 🎉</h3>
           
           <div className="nft-minted-links">
             <a 
