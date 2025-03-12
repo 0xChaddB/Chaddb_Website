@@ -80,7 +80,7 @@ function App() {
 
         console.log('📡 API Response Status:', response.status);
 
-        // Ensure response is readable
+        // Read raw response text
         const responseText = await response.text();
         console.log('📡 Raw API Response:', responseText);
 
@@ -92,45 +92,40 @@ function App() {
         const data = JSON.parse(responseText);
         console.log('✅ API Data:', data);
 
-        if (data.success === true) {
-            setMintStatus("NFT minted successfully!");
-            setStatusType("success");
-            setMintedNFTInfo({
-                transactionId: data.txId,
-                transactionHash: data.transactionHash,
-                metadataURI: data.metadataURI,
-                tokenId: data.tokenId,
-                openseaUrl: `https://testnets.opensea.io/assets/polygon-amoy/${process.env.VITE_NFT_CONTRACT_ADDRESS}/${data.tokenId}`,
-                blockExplorerUrl: `https://www.oklink.com/fr/amoy/tx/${data.transactionHash}`
-            });
-            setNextTokenId(data.tokenId + 1);
-            setIsMinted(true);
-        } else {
+        if (data.success !== true) {  // Fix: Explicitly check for `success: true`
             console.error('⚠️ API Error Detected:', data);
-            setMintStatus(data.error || "Mint failed");
-            setStatusType("error");
-            setErrorMessage(data.details || "Unknown error");
-            setShowErrorPopup(true);
+            throw new Error(data.error || "Mint failed");
         }
+
+        setMintStatus("NFT minted successfully!");
+        setStatusType("success");
+        setMintedNFTInfo({
+            transactionId: data.txId,
+            transactionHash: data.transactionHash,
+            metadataURI: data.metadataURI,
+            tokenId: data.tokenId,
+            openseaUrl: `https://testnets.opensea.io/assets/polygon-amoy/${process.env.VITE_NFT_CONTRACT_ADDRESS}/${data.tokenId}`,
+            blockExplorerUrl: `https://www.oklink.com/fr/amoy/tx/${data.transactionHash}`
+        });
+        setNextTokenId(data.tokenId + 1);
+        setIsMinted(true);
     } catch (error: unknown) {
-      console.error('❌ Frontend Error:', error);
-      let errorMessage = "An unexpected error occurred. Please try again.";
+        console.error('❌ Frontend Error:', error);
+        
+        let errorMessage = "An unexpected error occurred. Please try again.";
         if (error instanceof Error) {
-          errorMessage = error.message;
-      } else if (typeof error === 'string') {
-          errorMessage = error;
-      } else if (typeof error === 'object' && error !== null) {
-          errorMessage = JSON.stringify(error);
-      }
-  
-      setMintStatus(errorMessage);
-      setStatusType("error");
-      setErrorMessage(errorMessage);
-      setShowErrorPopup(true);
+            errorMessage = error.message;
+        } 
+
+        setMintStatus(errorMessage);
+        setStatusType("error");
+        setErrorMessage(errorMessage);
+        setShowErrorPopup(true);
     } finally {
         setIsMinting(false);
     }
   };
+
   const NFTMintedDetails = () => {
     if (!mintedNFTInfo) return null;
     
