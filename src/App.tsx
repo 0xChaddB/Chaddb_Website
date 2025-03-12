@@ -80,8 +80,14 @@ function App() {
         },
         body: JSON.stringify({ recipient: address }),
       });
-      
+    
       const data = await response.json();
+      if (!data.success) {
+        console.error("Mint error:", data);
+        setErrorMessage(data.error);
+        setShowErrorPopup(true);
+      }
+      console.log("Mint API Response:", data);
       
       if (data.success) {
         setMintStatus("NFT minted successfully!");
@@ -128,7 +134,6 @@ function App() {
               errorMessage += `: ${data.details}`;
             }
         }
-        
         console.error('Error details:', data);
         setMintStatus(errorMessage);
         setStatusType("error");
