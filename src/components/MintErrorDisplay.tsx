@@ -11,6 +11,7 @@ const MintErrorDisplay: React.FC<MintErrorDisplayProps> = ({
   onClose,
   onRetry 
 }) => {
+    console.log('🔥 MintErrorDisplay Rendered with:', errorMessage);
   return (
     <div className="error-popup">
       <div className="error-popup-content">

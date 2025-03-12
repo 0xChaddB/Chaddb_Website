@@ -55,7 +55,10 @@ function generateSVG(colors) {
     </svg>
   `;
 }
-console.log('✅ Initialisation de api/mint.js');
+  console.log('✅ Mint API reached');
+  console.log('Request body:', req.body);
+
+  console.log('✅ Initialisation de api/mint.js');
 // 🚀 **API Serverless Mint NFT**
 export default async function handler(req, res) {
   console.log('✅ /api/mint called with', req.body);
@@ -71,6 +74,7 @@ export default async function handler(req, res) {
   try {
     const { recipient } = req.body;
     if (!recipient) {
+      console.log('❌ Missing recipient error');
       return res.status(400).json({ 
         success: false,
         error: 'Missing recipient address',
@@ -245,4 +249,6 @@ export default async function handler(req, res) {
       details: error.message || 'An unexpected error occured'
     });
   }
+
+
 }
