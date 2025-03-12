@@ -8,6 +8,57 @@ import NFTLogo from './components/NFTLogo';
 import NFTPreview from './components/NFTPreview';
 import MintErrorDisplay from './components/MintErrorDisplay';
 
+// Error typage
+type ErrorCode =
+  | 'ALREADY_OWNS_NFT'
+  | 'MAX_SUPPLY_REACHED'
+  | 'UNAUTHORIZED'
+  | 'MINT_FAILED'
+  | 'IPFS_IMAGE_UPLOAD_FAILED'
+  | 'IPFS_METADATA_UPLOAD_FAILED'
+  | 'TRANSACTION_FAILED'
+  | 'TRANSACTION_REVERTED'
+  | 'TRANSACTION_TIMEOUT'
+  | 'METHOD_NOT_ALLOWED'
+  | 'MISSING_RECIPIENT'
+  | 'INVALID_ADDRESS'
+  | 'CONTRACT_READ_ERROR'
+  | 'ENCODE_DATA_ERROR'
+  | 'PROCESSING_ERROR'
+  | 'UNKNOWN_ERROR';
+
+// Mapping des erreurs avec typage explicite
+const errorMessages: Record<ErrorCode, string> = {
+  'ALREADY_OWNS_NFT': 'You already own an NFT from this collection!',
+  'MAX_SUPPLY_REACHED': 'Sorry, all NFTs have been minted!',
+  'UNAUTHORIZED': 'Server authorization error. Please try again later.',
+  'MINT_FAILED': 'NFT minting failed. Please try again.',
+  'IPFS_IMAGE_UPLOAD_FAILED': 'Failed to upload artwork. Please try again.',
+  'IPFS_METADATA_UPLOAD_FAILED': 'Failed to upload metadata. Please try again.',
+  'TRANSACTION_FAILED': 'Transaction failed. Please check your wallet and try again.',
+  'TRANSACTION_REVERTED': 'Transaction was rejected by the blockchain.',
+  'TRANSACTION_TIMEOUT': 'Transaction is taking too long. Please check your wallet for confirmation.',
+  'METHOD_NOT_ALLOWED': 'Invalid request method.',
+  'MISSING_RECIPIENT': 'Wallet address is required.',
+  'INVALID_ADDRESS': 'Invalid wallet address format.',
+  'CONTRACT_READ_ERROR': 'Cannot read blockchain data. Please try again.',
+  'ENCODE_DATA_ERROR': 'Error preparing transaction. Please try again.',
+  'PROCESSING_ERROR': 'Error processing your request. Please try again.',
+  'UNKNOWN_ERROR': 'An unexpected error occurred.'
+};
+
+// Interface pour les données de réponse de l'API
+interface MintResponse {
+  success: boolean;
+  txId: string;
+  transactionHash?: string;
+  metadataURI: string;
+  tokenId: number;
+  error?: string;
+  errorCode?: string;
+}
+
+// Interface
 interface MintedNFTInfo {
   transactionId: string;
   transactionHash: string;
@@ -16,6 +67,27 @@ interface MintedNFTInfo {
   openseaUrl: string;
   blockExplorerUrl: string;
 }
+
+// Func type
+const log = (...args: unknown[]) => {
+  if (import.meta.env.MODE === 'development') console.log(...args);
+};
+
+const handleError = (
+  setMintStatus: React.Dispatch<React.SetStateAction<string>>,
+  setStatusType: React.Dispatch<React.SetStateAction<string>>,
+  setErrorMessage: React.Dispatch<React.SetStateAction<string>>,
+  setShowErrorPopup: React.Dispatch<React.SetStateAction<boolean>>,
+  setIsMinting: React.Dispatch<React.SetStateAction<boolean>>
+) => (error: unknown, customMessage = "An unexpected error occurred.") => {
+  log('❌ Error:', error);
+  const errorMessage = error instanceof Error ? error.message : customMessage;
+  setMintStatus(errorMessage);
+  setStatusType("error");
+  setErrorMessage(errorMessage);
+  setShowErrorPopup(true);
+  setIsMinting(false);
+};
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -31,6 +103,7 @@ function App() {
 
   const { address, isConnected } = useAccount();
 
+  // Nextokenid
   useEffect(() => {
     const fetchNextTokenId = async () => {
       try {
@@ -45,8 +118,7 @@ function App() {
     };
     
     fetchNextTokenId();
-
-    const interval = setInterval(fetchNextTokenId, 30000); 
+    const interval = setInterval(fetchNextTokenId, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -62,75 +134,86 @@ function App() {
 
   const handleMintNFT = async () => {
     if (!isConnected || !address) return;
-  
+
     setIsMinting(true);
     setMintStatus("Minting in progress...");
     setStatusType("connected");
     setIsMinted(false);
     setMintedNFTInfo(null);
     setShowErrorPopup(false);
-  
+
+    const errorHandler = handleError(setMintStatus, setStatusType, setErrorMessage, setShowErrorPopup, setIsMinting);
+
     try {
-      console.log('📡 Sending mint request...');
-      const response = await fetch('/api/mint', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ recipient: address }),
+      log('📡 Sending mint request...');
+
+      const TIMEOUT_MS = parseInt(import.meta.env.VITE_MINT_TIMEOUT_MS, 10) || 30000;
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Request timed out. Please try again.")), TIMEOUT_MS)
+      );
+
+      const response = await Promise.race<Response | never>([
+        fetch('/api/mint', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ recipient: address }),
+          cache: 'no-store',
+        }),
+        timeoutPromise
+      ]);
+
+      log('📡 API Response Status:', response.status);
+      log('📡 API Response Headers:', response.headers);
+
+      const data: MintResponse = await response.json().catch(() => {
+        throw new Error(`Server error (${response.status}): Invalid response format.`);
       });
-  
-      console.log('📡 API Response Status:', response.status);
-  
-      const responseText = await response.text();
-      console.log('📡 Raw API Response:', responseText);
-  
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (jsonError) {
-        console.error('❌ JSON Parsing Error:', jsonError);
-        throw new Error(`Invalid JSON from API: ${responseText}`);
-      }
-  
+
+      log('📡 API Raw Data:', data);
+
       if (!response.ok) {
-        console.error('⚠️ API returned error:', data);
-        throw new Error(data.error || "Mint failed.");
+        const errorCode = (data?.errorCode || 'UNKNOWN_ERROR') as ErrorCode;
+        const friendlyMessage = errorMessages[errorCode] || data?.error || "An unexpected error occurred.";
+        return errorHandler(new Error(friendlyMessage), friendlyMessage);
       }
-  
-      console.log('✅ API Data:', data);
-  
-      setMintStatus("NFT minted successfully!");
-      setStatusType("success");
-      setMintedNFTInfo({
+
+      if (!data.txId || !data.tokenId || !data.metadataURI) {
+        throw new Error("Invalid API response: Missing required fields.");
+      }
+
+      const contractAddress = import.meta.env.VITE_NFT_CONTRACT_ADDRESS;
+      if (!contractAddress) {
+        throw new Error("NFT contract address is not configured.");
+      }
+
+      const mintedInfo: MintedNFTInfo = {
         transactionId: data.txId,
-        transactionHash: data.transactionHash,
+        transactionHash: data.transactionHash || data.txId,
         metadataURI: data.metadataURI,
         tokenId: data.tokenId,
-        openseaUrl: `https://testnets.opensea.io/assets/polygon-amoy/${process.env.VITE_NFT_CONTRACT_ADDRESS}/${data.tokenId}`,
-        blockExplorerUrl: `https://www.oklink.com/fr/amoy/tx/${data.transactionHash}`
-      });
+        openseaUrl: `https://testnets.opensea.io/assets/amoy/${contractAddress}/${data.tokenId}`,
+        blockExplorerUrl: `https://www.oklink.com/fr/amoy/tx/${data.transactionHash || data.txId}`
+      };
+
+      setMintStatus("NFT minted successfully!");
+      setStatusType("success");
+      setMintedNFTInfo(mintedInfo);
       setNextTokenId(data.tokenId + 1);
       setIsMinted(true);
+
+      log('✅ Minted NFT Info:', mintedInfo);
+
     } catch (error) {
-      console.error('❌ Frontend Error:', error);
-  
-      let errorMessage = "An unexpected error occurred.";
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } 
-  
-      setMintStatus(errorMessage);
-      setStatusType("error");
-      setErrorMessage(errorMessage);
-      setShowErrorPopup(true);
+      errorHandler(error);
     } finally {
       setIsMinting(false);
     }
   };
-  
 
+  // NFT DETAILS
   const NFTMintedDetails = () => {
     if (!mintedNFTInfo) return null;
-    
+
     return (
       <div className="success-popup">
         <div className="success-popup-content">
@@ -140,9 +223,7 @@ function App() {
           >
             ×
           </button>
-          
-          <h3 className="nft-minted-title">🎉 NFT Minted successfuly! 🎉</h3>
-          
+          <h3 className="nft-minted-title">🎉 NFT Minted successfully! 🎉</h3>
           <div className="nft-minted-links">
             <a 
               href={mintedNFTInfo.blockExplorerUrl} 
@@ -161,7 +242,6 @@ function App() {
               Voir sur OpenSea
             </a>
           </div>
-          
           <div className="nft-minted-preview">
             <NFTPreview metadataURI={mintedNFTInfo.metadataURI} />
           </div>
@@ -169,6 +249,8 @@ function App() {
       </div>
     );
   };
+
+
 
   return (
     <>
