@@ -112,17 +112,25 @@ function App() {
             setErrorMessage(data.details || "Unknown error");
             setShowErrorPopup(true);
         }
-    } catch (error) {
-        console.error('❌ Frontend Error:', error);
-        setMintStatus(error.message || "An unexpected error occurred. Please try again.");
-        setStatusType("error");
-        setErrorMessage(error.message);
-        setShowErrorPopup(true);
+    } catch (error: unknown) {
+      console.error('❌ Frontend Error:', error);
+      let errorMessage = "An unexpected error occurred. Please try again.";
+        if (error instanceof Error) {
+          errorMessage = error.message;
+      } else if (typeof error === 'string') {
+          errorMessage = error;
+      } else if (typeof error === 'object' && error !== null) {
+          errorMessage = JSON.stringify(error);
+      }
+  
+      setMintStatus(errorMessage);
+      setStatusType("error");
+      setErrorMessage(errorMessage);
+      setShowErrorPopup(true);
     } finally {
         setIsMinting(false);
     }
-};
-
+  };
   const NFTMintedDetails = () => {
     if (!mintedNFTInfo) return null;
     
