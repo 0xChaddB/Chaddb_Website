@@ -25,6 +25,7 @@ function App() {
   const [isMinted, setIsMinted] = useState(false);
   const [nextTokenId, setNextTokenId] = useState(0);
   const [mintedNFTInfo, setMintedNFTInfo] = useState<MintedNFTInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { address, isConnected } = useAccount();
 
@@ -61,6 +62,7 @@ function App() {
     if (!isConnected || !address) return;
     
     setIsMinting(true);
+    setIsLoading(true);
     setMintStatus("Minting en cours...");
     setStatusType("connected");
     
@@ -77,7 +79,7 @@ function App() {
       const data = await response.json();
       
       if (data.success) {
-        setMintStatus("NFT minted!");
+        setMintStatus("NFT minté avec succès!");
         setStatusType("success");
         
         // Stocker les informations du NFT minté
@@ -103,6 +105,7 @@ function App() {
       setStatusType("error");
     } finally {
       setIsMinting(false);
+      setIsLoading(false);
     }
   };
   const NFTMintedDetails = () => {
@@ -118,7 +121,7 @@ function App() {
             ×
           </button>
           
-          <h3 className="nft-minted-title">NFT minted successfully!</h3>
+          <h3 className="nft-minted-title">🎉 NFT Minté avec succès! 🎉</h3>
           
           <div className="nft-minted-links">
             <a 
@@ -236,7 +239,7 @@ function App() {
           <p className="section-subtitle">Technologies and tools I specialize in.</p>
           <div className="tech-grid">
             {techStackData.map((tech, index) => {
-              const IconComponent = tech.icon; 
+              const IconComponent = tech.icon; // Récupère le composant d’icône
               return (
                 <div key={index} className="tech-card">
                   <IconComponent className="tech-icon" />
@@ -305,6 +308,13 @@ function App() {
                   }}
                 </ConnectButton.Custom>
                 
+                {isLoading && (
+                  <div className="loading-spinner-container">
+                    <div className="loading-spinner"></div>
+                    <span>Loading...</span>
+                  </div>
+                )}
+                
                 <button
                   onClick={handleMintNFT}
                   disabled={!isConnected || isMinting || isMinted}
@@ -312,7 +322,10 @@ function App() {
                 >
                   {isMinting ? 'Minting...' : isMinted ? 'Minted ✓' : 'Mint NFT'}
                 </button>
-            
+                
+                {isMinted && mintedNFTInfo && (
+                  <NFTMintedDetails />
+                )}
               </div>
               </div>
             </div>
@@ -331,7 +344,7 @@ function App() {
           <div className="loading-popup-content">
             <div className="loading-spinner"></div>
             <h3 className="loading-title">Minting in progress...</h3>
-            <p className="loading-text">Please wait for your NFT to be minted on the blockchain</p>
+            <p className="loading-text">Please wait for your NFT to be mint on the blockchain</p>
           </div>
         </div>
       )}

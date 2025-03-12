@@ -3,10 +3,10 @@ import React from 'react';
 const AnimatedLogo: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 834.6801 950"
-      width="834.6801" // Taille par défaut restaurée
-      height="950"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 834.6801 950"
+        width="834.6801" // Largeur exacte du viewBox
+        height="950" 
       {...props}
     >
       <path
