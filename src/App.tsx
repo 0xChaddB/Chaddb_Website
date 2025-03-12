@@ -25,7 +25,6 @@ function App() {
   const [isMinted, setIsMinted] = useState(false);
   const [nextTokenId, setNextTokenId] = useState(0);
   const [mintedNFTInfo, setMintedNFTInfo] = useState<MintedNFTInfo | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const { address, isConnected } = useAccount();
 
@@ -62,7 +61,6 @@ function App() {
     if (!isConnected || !address) return;
     
     setIsMinting(true);
-    setIsLoading(true);
     setMintStatus("Minting en cours...");
     setStatusType("connected");
     
@@ -105,7 +103,6 @@ function App() {
       setStatusType("error");
     } finally {
       setIsMinting(false);
-      setIsLoading(false);
     }
   };
   const NFTMintedDetails = () => {
@@ -307,13 +304,6 @@ function App() {
                     );
                   }}
                 </ConnectButton.Custom>
-                
-                {isLoading && (
-                  <div className="loading-spinner-container">
-                    <div className="loading-spinner"></div>
-                    <span>Loading...</span>
-                  </div>
-                )}
                 
                 <button
                   onClick={handleMintNFT}
