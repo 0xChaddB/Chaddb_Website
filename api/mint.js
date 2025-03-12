@@ -55,13 +55,14 @@ function generateSVG(colors) {
     </svg>
   `;
 }
-  console.log('✅ Mint API reached');
-  console.log('Request body:', req.body);
+  
 
   console.log('✅ Initialisation de api/mint.js');
 // 🚀 **API Serverless Mint NFT**
 export default async function handler(req, res) {
   console.log('✅ /api/mint called with', req.body);
+  console.log('✅ Mint API reached');
+  console.log('Request body:', req.body);
   if (req.method !== 'POST') {
     return res.status(405).json({ 
       success: false,
