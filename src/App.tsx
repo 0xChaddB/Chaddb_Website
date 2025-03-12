@@ -42,8 +42,8 @@ function App() {
     };
     
     fetchNextTokenId();
-    // Rafraîchir périodiquement
-    const interval = setInterval(fetchNextTokenId, 30000); // Toutes les 30 secondes
+
+    const interval = setInterval(fetchNextTokenId, 30000); 
     return () => clearInterval(interval);
   }, []);
 
@@ -63,9 +63,10 @@ function App() {
     setIsMinting(true);
     setMintStatus("Minting en cours...");
     setStatusType("connected");
+
+    setIsMinted(false);
     
     try {
-      // Appel à votre API pour minter le NFT
       const response = await fetch('/api/mint', {
         method: 'POST',
         headers: {
@@ -80,7 +81,6 @@ function App() {
         setMintStatus("NFT minté avec succès!");
         setStatusType("success");
         
-        // Stocker les informations du NFT minté
         setMintedNFTInfo({
           transactionId: data.txId,
           transactionHash: data.transactionHash,
@@ -90,17 +90,18 @@ function App() {
           blockExplorerUrl: `https://www.oklink.com/fr/amoy/tx/${data.transactionHash}`
         });
         
-        // Incrémenter le prochain token ID
         setNextTokenId(prev => prev + 1);
         setIsMinted(true);
       } else {
         setMintStatus(`Échec du mint: ${data.error}`);
         setStatusType("error");
+        setIsMinted(false);
       }
     } catch (error) {
       console.error('Erreur lors du mint:', error);
       setMintStatus("Une erreur est survenue lors du mint");
       setStatusType("error");
+      setIsMinted(false); 
     } finally {
       setIsMinting(false);
     }
@@ -236,7 +237,7 @@ function App() {
           <p className="section-subtitle">Technologies and tools I specialize in.</p>
           <div className="tech-grid">
             {techStackData.map((tech, index) => {
-              const IconComponent = tech.icon; // Récupère le composant d’icône
+              const IconComponent = tech.icon; 
               return (
                 <div key={index} className="tech-card">
                   <IconComponent className="tech-icon" />
@@ -304,7 +305,7 @@ function App() {
                     );
                   }}
                 </ConnectButton.Custom>
-                
+
                 <button
                   onClick={handleMintNFT}
                   disabled={!isConnected || isMinting || isMinted}
@@ -339,7 +340,7 @@ function App() {
         </div>
       )}
 
-      {isMinted && mintedNFTInfo && <NFTMintedDetails />}
+      {isMinted && mintedNFTInfo && mintedNFTInfo.transactionHash && <NFTMintedDetails />}
     </>
 
     
