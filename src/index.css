@@ -16,23 +16,31 @@ html {
   scroll-behavior: smooth;
 }
 
+:root,
+html,
+body,
+.app-container {
+  overflow-x: hidden;
+  width: 100vw;
+  max-width: 100%;
+}
+
 body {
   background: linear-gradient(45deg, var(--dark), #2a2a2a);
   color: #fff;
-  overflow-x: hidden;
   min-height: 100vh;
 }
+
 .app-container {
   position: relative;
   min-height: 100vh;
-  overflow-x: hidden;
 }
 
 .background-logo {
-  position: absolute; /* Changement de fixed à absolute */
-  top: 0; /* Tout en haut */  
-  left: 75%; /* Toujours à droite */
-  transform: translate(-50%, 0); /* Centré horizontalement, pas de décalage vertical */
+  position: absolute; 
+  top: 0; 
+  left: 75%; 
+  transform: translate(-50%, 0); 
   width: 48vw;
   height: auto;
   max-width: 800px;
@@ -68,6 +76,7 @@ body {
   z-index: 0;
   opacity: 0.4;
   pointer-events: none;
+  overflow: hidden;
 }
 
 /* Navigation */
@@ -176,6 +185,7 @@ body {
 .button-container {
   position: relative;
   z-index: 2;
+  display: flex;
 }
 
 .button {
@@ -532,10 +542,10 @@ body {
 }
 
 .tech-icon {
-  width: 3rem; /* Taille fixe pour SVG */
+  width: 3rem; /* SVG fixed size*/
   height: 3rem;
   margin-bottom: 1rem;
-  color: var(--glow); /* Applique la couleur glow */
+  color: var(--glow); 
   transition: transform 0.3s ease-in-out;
 }
 
@@ -696,11 +706,7 @@ body {
   margin-right: 0.5rem;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
+
 
 /* Footer */
 footer {
@@ -768,6 +774,8 @@ footer {
   .button-container {
     flex-direction: column;
     gap: 1rem;
+    margin: 0;
+    text-align: center;
   }
 
   .tech-grid,
@@ -777,9 +785,12 @@ footer {
 
   /* Carousel adjustments */
   .carousel-button {
-    width: 40px;
-    height: 40px;
-    font-size: 1.2rem;
+    display: none;
+    
+  }
+
+  .carousel-content-wrapper {
+    width: 100%;
   }
 
   /* RainbowKit custom styles */
@@ -792,7 +803,6 @@ footer {
 
   [data-rk] button:hover {
     transform: translateY(-3px) !important;
-    box-shadow: 0 10px 20px rgba(0, 255, 136, 0.2) !important;
   }
 
   [data-rk] {
@@ -812,15 +822,21 @@ footer {
   .mint-controls [data-rk] button,
   .mint-button {
     width: 100%;
+    
   }
   
   .background-logo {
-    top: 70%; /* Centre verticalement */
-    left: 70%; /* Centre horizontalement */
-    transform: translate(-50%, -50%); /* Centre précisément */
-    width: 100vw; /* Plus grand, 80% de la largeur de l’écran */
-    max-width: none; /* Supprime la limite pour mobile */
-    opacity: 0.16; /* Légèrement plus discret si besoin */
+    top: 50%;
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    width: 80vw; 
+    max-width: none;
+    opacity: 0.16;
+
+  }
+
+  .button-secondary {
+    margin: 0;
   }
 }
 
@@ -845,7 +861,7 @@ footer {
     min-width: 33.33%;
   }
   .carousel-content:has(> .carousel-item:nth-last-child(-n+1):nth-child(4)) .carousel-item:nth-child(4) {
-    min-width: 100%; /* Le dernier projet (4e) prend toute la largeur */
+    min-width: 100%; 
   }
 }
 
@@ -857,11 +873,11 @@ footer {
 
 @media (min-width: 640px) and (max-width: 1023px) {
   .carousel-item {
-    min-width: 50%; /* 2 projets */
+    min-width: 50%; /* 2 projetcs */
   }
 }
 
-/* Styles pour les détails du NFT minté */
+/* Styles for NFT Minted Details */
 .nft-minted-details {
   background: rgba(0, 255, 136, 0.1);
   border: 1px solid rgba(0, 255, 136, 0.3);
@@ -968,7 +984,7 @@ footer {
   color: var(--glow);
 }
 
-/* Styles pour le numéro de token */
+/* Styles for token number */
 .nft-token-number {
   color: var(--glow);
   animation: pulse 1s ease-in-out;
@@ -1050,9 +1066,7 @@ footer {
   line-height: 1.6;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+
 
 /* Styles for success popup */
 .success-popup {
@@ -1098,7 +1112,6 @@ footer {
   color: var(--glow);
 }
 
-/* Le reste des styles existants pour les éléments à l'intérieur de la popup */
 .nft-minted-title {
   font-size: 1.5rem;
   margin-bottom: 1rem;
@@ -1184,7 +1197,6 @@ footer {
   margin-top: 1.5rem;
 }
 
-/* Enhanced styles for error status */
 .mint-status.error {
   background: rgba(255, 85, 85, 0.1);
   color: #ff5555;
@@ -1199,7 +1211,6 @@ footer {
   100% { background: rgba(255, 85, 85, 0.1); }
 }
 
-/* Improved styles for disabled buttons */
 .button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
