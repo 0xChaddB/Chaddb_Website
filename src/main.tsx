@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { WagmiProvider } from 'wagmi';
 import { polygon } from 'wagmi/chains';
-import { http, webSocket } from 'viem';
+import { webSocket, } from 'viem';
 import {
   RainbowKitProvider,
   darkTheme,
@@ -19,7 +19,6 @@ const config = getDefaultConfig({
   chains: [polygon],
   transports: {
     [polygon.id]: webSocket(import.meta.env.VITE_WS_RPC_URL),
-   
   },
 });
 
