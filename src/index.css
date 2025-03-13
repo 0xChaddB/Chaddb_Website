@@ -827,9 +827,8 @@ footer {
   
   .background-logo {
     top: 50%;
-    left: 50%; 
     transform: translate(-50%, -50%);
-    width: 80vw; 
+    width: 100vw; 
     max-width: none;
     opacity: 0.16;
 
