@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useAccount } from 'wagmi';
+import { useAccount, useReadContract, useWatchContractEvent } from 'wagmi';
 import ProjectCarousel from './components/ProjectCarousel';
 import { techStackData } from './data/techStack';
 import AnimatedLogo from './components/AnimatedLogo';
 import NFTLogo from './components/NFTLogo';
 import NFTPreview from './components/NFTPreview';
 import MintErrorDisplay from './components/MintErrorDisplay';
+import nftABI from '../api/nftABI.json';
 
 // Error typage
 type ErrorCode =
@@ -103,24 +104,31 @@ function App() {
 
   const { address, isConnected } = useAccount();
 
+  const { data: totalMintedData, isLoading } = useReadContract({
+    address: import.meta.env.VITE_NFT_CONTRACT_ADDRESS as `0x${string}`,
+    abi: nftABI,
+    functionName: 'totalMinted',
+  });
+
   // Nextokenid
   useEffect(() => {
-    const fetchNextTokenId = async () => {
-      try {
-        const response = await fetch('/api/next-token-id');
-        const data = await response.json();
-        if (data.success) {
-          setNextTokenId(data.nextTokenId);
-        }
-      } catch (error) {
-        console.error('Erreur lors de la récupération du nextTokenId:', error);
-      }
-    };
-    
-    fetchNextTokenId();
-    const interval = setInterval(fetchNextTokenId, 30000);
-    return () => clearInterval(interval);
-  }, []);
+    if (totalMintedData !== undefined) {
+      setNextTokenId(Number(totalMintedData) + 1);
+    }
+  }, [totalMintedData]);
+
+  // Subscribe to Transfer events for real-time updates
+  useWatchContractEvent({
+    address: import.meta.env.VITE_NFT_CONTRACT_ADDRESS as `0x${string}`,
+    abi: nftABI,
+    eventName: 'Transfer',
+    args: { from: '0x0000000000000000000000000000000000000000' }, // Filter for mints
+    onLogs: (logs) => {
+      console.log('New mint detected:', logs);
+      setNextTokenId((prev) => (prev !== null ? prev + 1 : 2)); // Increment on each mint
+    },
+    onError: (error) => console.error('Event subscription error:', error),
+  });
 
   useEffect(() => {
     if (isConnected && address) {
@@ -198,7 +206,6 @@ function App() {
       setMintStatus("NFT minted successfully!");
       setStatusType("success");
       setMintedNFTInfo(mintedInfo);
-      setNextTokenId(data.tokenId + 1);
       setIsMinted(true);
 
       log('✅ Minted NFT Info:', mintedInfo);
@@ -371,15 +378,15 @@ function App() {
                 <h3 className="nft-name">
                   Visitor Badge #
                   <span className="nft-token-number">
-                    {nextTokenId ? String(nextTokenId).padStart(3, '0') : '001'}
+                    {isLoading || nextTokenId === null ? 'Loading...' : String(nextTokenId).padStart(3, '0')}
                   </span>
                 </h3>
                   <p className="nft-info">This NFT changes color randomly at each mint, ensuring a unique NFT for everyone!</p>
                 </div>
                 <div className="nft-stats">
                   <div className="nft-stat">
-                    <div className="nft-stat-value">1000</div>
-                    <div className="nft-stat-label">Total Supply</div>
+                    <div className="nft-stat-value">{isLoading ? '...' : nextTokenId !== null ? nextTokenId : '0'}</div>
+                    <div className="nft-stat-label">Minted So Far</div>
                   </div>
                   <div className="nft-stat">
                     <div className="nft-stat-value">Free</div>

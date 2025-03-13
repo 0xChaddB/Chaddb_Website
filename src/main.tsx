@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { WagmiProvider } from 'wagmi';
 import { polygon } from 'wagmi/chains';
-import { http } from 'viem';
+import { http, webSocket } from 'viem';
 import {
   RainbowKitProvider,
   darkTheme,
@@ -15,10 +15,11 @@ import './index.css';
 
 const config = getDefaultConfig({
   appName: '0xChaddB Portfolio',
-  projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID, // From env
+  projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID,
   chains: [polygon],
   transports: {
-    [polygon.id]: http(import.meta.env.VITE_RPC_URL), // From env
+    [polygon.id]: webSocket(import.meta.env.VITE_WS_RPC_URL),
+   
   },
 });
 

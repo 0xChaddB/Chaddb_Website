@@ -115,11 +115,12 @@ export default async function handler(req, res) {
           abi: nftABI,
           functionName: 'totalMinted',
         }),
+        /*
         publicClient.readContract({
           address: process.env.NFT_CONTRACT_ADDRESS,
           abi: nftABI,
-          functionName: 'MAX_SUPPLY',
-        }),
+          functionName: 'MAX_SUPPLY'  ,
+        }),*/
         publicClient.readContract({
           address: process.env.NFT_CONTRACT_ADDRESS,
           abi: nftABI,
