@@ -8,17 +8,15 @@ import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-// Charger les variables d'environnement
 dotenv.config();
 
-// Validation des variables d'environnement critiques
 const requiredEnvVars = [
   'NFT_CONTRACT_ADDRESS',
   'PINATA_API_KEY',
   'PINATA_API_SECRET',
   'DEFENDER_API_KEY',
   'DEFENDER_API_SECRET',
-  'RPC_URL' // Changé de VITE_RPC_URL à RPC_URL car côté serveur
+  'RPC_URL' 
 ];
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
@@ -27,7 +25,7 @@ for (const envVar of requiredEnvVars) {
   }
 }
 
-// Initialisation des services
+// Initialization
 const pinata = new pinataSDK(process.env.PINATA_API_KEY, process.env.PINATA_API_SECRET);
 const relayer = new Relayer({
   apiKey: process.env.DEFENDER_API_KEY,
@@ -38,7 +36,7 @@ const publicClient = createPublicClient({
   transport: http(process.env.RPC_URL),
 });
 
-// Charger l'ABI du contrat NFT
+// contract abi load
 let nftABI;
 try {
   const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -49,12 +47,11 @@ try {
   process.exit(1);
 }
 
-// Fonction de log conditionnelle (inspirée de handleMintNFT)
 const log = (...args) => {
   if (process.env.NODE_ENV === 'development') console.log(...args);
 };
 
-// Générer des couleurs aléatoires
+// Random colors generation
 function generateRandomColors() {
   const generateColor = () => `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
   return {
@@ -98,7 +95,6 @@ export default async function handler(req, res) {
   try {
     const { recipient } = req.body;
 
-    // Vérification stricte de l'adresse Ethereum
     if (!recipient || !/^0x[a-f0-9]{40}$/.test(recipient.toLowerCase())) {
       return res.status(400).json({
         success: false,
@@ -108,12 +104,12 @@ export default async function handler(req, res) {
       });
     }
 
-    log('🔍 Vérification du statut de mint pour:', recipient);
+    log('🔍 Verification mint status for:', recipient);
 
-    // Vérification parallèle du total minted, max supply et balance
-    let totalMinted, maxSupply, userBalance;
+    // Parralel verification
+    let totalMinted, /*maxSupply,*/ userBalance;
     try {
-      [totalMinted, maxSupply, userBalance] = await Promise.all([
+      [totalMinted, /*maxSupply,*/ userBalance] = await Promise.all([
         publicClient.readContract({
           address: process.env.NFT_CONTRACT_ADDRESS,
           abi: nftABI,
@@ -131,7 +127,7 @@ export default async function handler(req, res) {
           args: [recipient]
         })
       ]);
-
+      /*
       if (Number(totalMinted) >= Number(maxSupply)) {
         return res.status(400).json({ 
           success: false,
@@ -140,7 +136,7 @@ export default async function handler(req, res) {
           details: 'No more NFTs available.'
         });
       }
-
+      */
       if (Number(userBalance) > 0) {
         return res.status(400).json({ 
           success: false,
@@ -160,10 +156,10 @@ export default async function handler(req, res) {
     }
 
     const tokenId = Number(totalMinted) + 1;
-    log('✅ Token ID calculé:', tokenId);
+    log('✅ Token ID calculated:', tokenId);
 
     // Génération et upload de l'image sur IPFS
-    log('🖌 Génération de l’image NFT...');
+    log('🖌 Generating NFT image...');
     const colors = generateRandomColors();
     const svgImage = generateSVG(colors);
 
@@ -187,7 +183,7 @@ export default async function handler(req, res) {
     log('✅ Image uploaded to IPFS:', imageURI);
 
     // Génération et upload des métadonnées sur IPFS
-    log('📝 Génération des métadonnées NFT...');
+    log('📝 Generating NFT metadata...');
     const metadata = {
       name: `Visitor Badge #${tokenId}`,
       description: "An exclusive NFT proving you visited 0xChaddB's portfolio.",
@@ -214,8 +210,7 @@ export default async function handler(req, res) {
     const metadataURI = `ipfs://${metadataResponse.IpfsHash}`;
     log('✅ Metadata uploaded to IPFS:', metadataURI);
 
-    // Construction et envoi de la transaction avec timeout
-    log('🚀 Envoi de la transaction de mint...');
+    log('🚀 Sending mint transaction..');
     let txResponse;
     try {
       const functionData = encodeFunctionData({
@@ -224,7 +219,7 @@ export default async function handler(req, res) {
         args: [recipient, metadataURI],
       });
 
-      const TIMEOUT_MS = parseInt(process.env.MINT_TIMEOUT_MS, 10) || 30000; // Aligné avec handleMintNFT
+      const TIMEOUT_MS = parseInt(process.env.MINT_TIMEOUT_MS, 10) || 30000; 
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Transaction timed out')), TIMEOUT_MS)
       );

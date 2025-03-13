@@ -231,7 +231,7 @@ function App() {
               rel="noopener noreferrer"
               className="nft-minted-link"
             >
-              Voir la transaction
+              See transaction
             </a>
             <a 
               href={mintedNFTInfo.openseaUrl} 
@@ -239,7 +239,7 @@ function App() {
               rel="noopener noreferrer"
               className="nft-minted-link"
             >
-              Voir sur OpenSea
+              Look on OpenSea
             </a>
           </div>
           <div className="nft-minted-preview">

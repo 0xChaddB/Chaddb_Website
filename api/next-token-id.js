@@ -34,8 +34,8 @@ export default async function handler(req, res) {
       functionName: 'totalMinted',
     });
 
-    // Le prochain tokenId est totalMinted + 1
-    const nextTokenId = Number(totalMinted) + 1;
+    // Le prochain tokenId est totalMinted 
+    const nextTokenId = Number(totalMinted);
 
     return res.status(200).json({
       success: true,
