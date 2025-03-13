@@ -385,7 +385,7 @@ function App() {
                 </div>
                 <div className="nft-stats">
                   <div className="nft-stat">
-                    <div className="nft-stat-value">{isLoading ? '...' : nextTokenId !== null ? nextTokenId : '0'}</div>
+                    <div className="nft-stat-value">{isLoading || totalMintedData === undefined ? '...' : Number(totalMintedData)}</div>
                     <div className="nft-stat-label">Minted So Far</div>
                   </div>
                   <div className="nft-stat">
