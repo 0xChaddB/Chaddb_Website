@@ -262,7 +262,9 @@ function App() {
   return (
     <>
       <div className="grid-bg"></div>
-      <AnimatedLogo className="background-logo" /> 
+      <div className="background-container">
+        <AnimatedLogo className="background-logo" /> 
+      </div>
       {/* Contact Modal */}
       <div id="contact-modal" className={`contact-modal ${isContactModalOpen ? 'active' : ''}`}>
         <div className="contact-modal-content">
