@@ -197,7 +197,14 @@ export default async function handler(req, res) {
 
     let metadataResponse;
     try {
-      metadataResponse = await pinata.pinJSONToIPFS(metadata);
+      metadataResponse = await pinata.pinJSONToIPFS(metadata, {
+        pinataMetadata: {
+          name: `nft-metadata-${tokenId}-${Date.now()}.json`
+        },
+        pinataOptions: {
+          cidVersion: 0 
+        }
+      });
     } catch (error) {
       log('❌ IPFS metadata upload failed:', error);
       return res.status(500).json({
