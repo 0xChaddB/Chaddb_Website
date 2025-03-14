@@ -43,12 +43,12 @@ try {
   const abiPath = join(__dirname, 'nftABI.json');
   nftABI = JSON.parse(readFileSync(abiPath, 'utf8'));
 } catch (error) {
-  console.error('❌ Erreur de chargement de l\'ABI:', error.message);
+  console.error('❌ Error loading ABI:', error.message);
   process.exit(1);
 }
 
 const log = (...args) => {
-  if (process.env.NODE_ENV === 'development') console.log(...args);
+  if (process.env.NODE_ENV === 'production') console.log(...args);
 };
 
 // Random colors generation
@@ -62,7 +62,7 @@ function generateRandomColors() {
   };
 }
 
-// Générer un SVG avec des couleurs random
+// GENERATE RANDOM SVG COLORS
 function generateSVG(colors) {
   return `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 834.6801 950" width="834.6801" height="950">
