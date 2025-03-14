@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import pinataSDK from '@pinata/sdk';
 import { createPublicClient, encodeFunctionData, http } from 'viem';
-import { polygonAmoy } from 'viem/chains';
+import { polygon } from 'viem/chains';
 import { Relayer } from '@openzeppelin/defender-relay-client';
 import { Readable } from 'stream';
 import { readFileSync } from 'fs';
