@@ -199,8 +199,8 @@ function App() {
         transactionHash: data.transactionHash || data.txId,
         metadataURI: data.metadataURI,
         tokenId: data.tokenId,
-        openseaUrl: `https://testnets.opensea.io/assets/amoy/${contractAddress}/${data.tokenId}`,
-        blockExplorerUrl: `https://www.oklink.com/fr/amoy/tx/${data.transactionHash || data.txId}`
+        openseaUrl: `https://opensea.io/item/matic/${contractAddress}/${data.tokenId}`,
+        blockExplorerUrl: `https://polygonscan.com/tx/${data.transactionHash || data.txId}`
       };
 
       setMintStatus("NFT minted successfully!");

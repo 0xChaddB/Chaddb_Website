@@ -1,5 +1,5 @@
 import { createPublicClient, http } from 'viem';
-import { polygonAmoy } from 'viem/chains';
+import { polygon } from 'viem/chains';
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -17,7 +17,7 @@ try {
 
 // Initialiser le client public
 const publicClient = createPublicClient({
-  chain: polygonAmoy,
+  chain: polygon,
   transport: http(process.env.VITE_RPC_URL),
 });
 
