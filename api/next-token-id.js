@@ -11,7 +11,7 @@ try {
   const abiPath = join(__dirname, 'nftABI.json');
   nftABI = JSON.parse(readFileSync(abiPath, 'utf8'));
 } catch (error) {
-  console.error('❌ Erreur de chargement de l\'ABI:', error.message);
+  console.error('❌ Error loading ABI:', error.message);
   process.exit(1);
 }
 
@@ -23,7 +23,7 @@ const publicClient = createPublicClient({
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Méthode non autorisée' });
+    return res.status(405).json({ error: 'Unauthorized method' });
   }
 
   try {
@@ -43,10 +43,10 @@ export default async function handler(req, res) {
       totalMinted: Number(totalMinted)
     });
   } catch (error) {
-    console.error('❌ Erreur lors de la récupération du tokenId:', error);
+    console.error('❌ Error fetching nextTokenId:', error);
     return res.status(500).json({
       success: false,
-      error: 'Impossible de récupérer le prochain tokenId'
+      error: 'Cant read next tokenId'
     });
   }
 }

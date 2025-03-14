@@ -18,14 +18,14 @@ const NFTPreview: React.FC<NFTPreviewProps> = ({ metadataURI }) => {
         
         const response = await fetch(ipfsGatewayUrl);
         if (!response.ok) {
-          throw new Error('Impossible de récupérer les métadonnées');
+          throw new Error('Cant fetch metadata');
         }
         
         const data = await response.json();
         setMetadata(data);
       } catch (err) {
-        console.error('Erreur de chargement des métadonnées:', err);
-        setError('Impossible de charger les métadonnées du NFT');
+        console.error('Error loading metadata:', err);
+        setError('Cant load NFT METADATA');
       } finally {
         setIsLoading(false);
       }

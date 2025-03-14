@@ -27,13 +27,13 @@ const ProjectCarousel = () => {
     }
   }, [visibleProjects]);
 
-  // Calcul du nombre total de groupes
+
   const totalGroups = Math.ceil(projectsData.length / visibleProjects) || 1;
-  // Ajustement pour desktop avec 4 projets
+
   const isDesktopWithExtra = window.innerWidth >= 1024 && projectsData.length === 4;
   const adjustedTotalGroups = isDesktopWithExtra ? 2 : totalGroups;
 
-  // Défilement vers le groupe suivant
+
   const next = useCallback(() => {
     if (!carouselRef.current) return;
     const itemWidth = carouselRef.current.scrollWidth / projectsData.length;
@@ -41,8 +41,8 @@ const ProjectCarousel = () => {
     
     let newScrollLeft;
     if (isDesktopWithExtra && newGroup === 1) {
-      // Dernier projet (4e) prend toute la largeur sur desktop
-      newScrollLeft = 3 * itemWidth; // Position après les 3 premiers projets
+
+      newScrollLeft = 3 * itemWidth; 
     } else {
       newScrollLeft = newGroup * visibleProjects * itemWidth;
     }
@@ -51,7 +51,7 @@ const ProjectCarousel = () => {
     setCurrentGroup(newGroup);
   }, [currentGroup, visibleProjects, adjustedTotalGroups, isDesktopWithExtra]);
 
-  // Défilement vers le groupe précédent
+
   const prev = useCallback(() => {
     if (!carouselRef.current) return;
     const itemWidth = carouselRef.current.scrollWidth / projectsData.length;
@@ -62,7 +62,7 @@ const ProjectCarousel = () => {
     setCurrentGroup(newGroup);
   }, [currentGroup, visibleProjects]);
 
-  // Synchronisation de l’index avec le défilement manuel
+  
   useEffect(() => {
     const handleScroll = () => {
       if (!carouselRef.current) return;
@@ -85,13 +85,13 @@ const ProjectCarousel = () => {
   }, [visibleProjects, isDesktopWithExtra]);
 
 
-  // Aller à un groupe spécifique via les dots
+  // go with dots
   const goToGroup = useCallback((groupIndex: number) => {
     if (!carouselRef.current) return;
     const itemWidth = carouselRef.current.scrollWidth / projectsData.length;
     let newScrollLeft;
     if (isDesktopWithExtra && groupIndex === 1) {
-      newScrollLeft = 3 * itemWidth; // Position du 4e projet
+      newScrollLeft = 3 * itemWidth; 
     } else {
       newScrollLeft = groupIndex * visibleProjects * itemWidth;
     }
