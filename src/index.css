@@ -40,9 +40,9 @@ body {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh; /* Couvre toute la hauteur de la fenêtre */
-  overflow: hidden; /* Coupe le débordement horizontal */
-  z-index: -2; /* Assure qu’il est derrière tout le contenu */
+  height: 100vh; 
+  overflow: hidden; 
+  z-index: -2;
 }
 
 .background-logo {
@@ -835,7 +835,7 @@ footer {
   }
 
   .background-container {
-    height: auto; /* S’adapte à la hauteur du contenu */
+    height: auto;
     min-height: 100vh;
   }
   
