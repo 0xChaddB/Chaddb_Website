@@ -20,14 +20,14 @@ export const projectsData: ProjectCardProps[] = [
     title: "Flashloan",
     tags: ["Solidity", "React", "Web3"],
     description: "Advanced lending protocol with innovative liquidation mechanisms and multi-token collateral support.",
-    link: "undefined"
+    link: undefined
   },
   {
     id: "swapper",
     title: "Swapper",
     tags: ["ERC-721", "IPFS", "Next.js"],
     description: "Decentralized NFT marketplace with advanced trading features and cross-chain compatibility.",
-    link: "undefined"
+    link: undefined
   },
 
   {
