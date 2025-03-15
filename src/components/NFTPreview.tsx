@@ -13,7 +13,7 @@ const NFTPreview: React.FC<NFTPreviewProps> = ({ metadataURI }) => {
     const fetchMetadata = async () => {
       try {
         setIsLoading(true);
-        // Convertir IPFS URI en HTTP pour récupérer les données
+        // Convert IPFS URI to HTTP to get data
         const ipfsGatewayUrl = metadataURI.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/');
         
         const response = await fetch(ipfsGatewayUrl);
@@ -44,7 +44,7 @@ const NFTPreview: React.FC<NFTPreviewProps> = ({ metadataURI }) => {
     return <div className="nft-preview-error">Impossible de charger l'aperçu du NFT</div>;
   }
   
-  // Convertir l'URI de l'image en URL HTTP
+  // Converts image URI to HTTP URL
   const imageUrl = metadata.image?.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/');
   
   return (
@@ -57,7 +57,7 @@ const NFTPreview: React.FC<NFTPreviewProps> = ({ metadataURI }) => {
             alt={metadata.name} 
             className="nft-preview-image" 
             onError={(e) => {
-              // Fallback en cas d'erreur de chargement d'image
+              // Fallback 
               e.currentTarget.src = '/images/nft-placeholder.png';
             }}
           />

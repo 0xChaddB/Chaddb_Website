@@ -4,7 +4,7 @@ import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-// Charger l'ABI du contrat NFT
+// Load contract 
 let nftABI;
 try {
   const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -15,7 +15,7 @@ try {
   process.exit(1);
 }
 
-// Initialiser le client public
+// Initialize public client
 const publicClient = createPublicClient({
   chain: polygon,
   transport: http(process.env.VITE_RPC_URL),
@@ -27,14 +27,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Lire le nombre total de NFTs mintés
+    // Get totalMinted NFT
     const totalMinted = await publicClient.readContract({
       address: process.env.NFT_CONTRACT_ADDRESS,
       abi: nftABI,
       functionName: 'totalMinted',
     });
 
-    // Le prochain tokenId est totalMinted 
+    // Next tokenid is totalMinted
     const nextTokenId = Number(totalMinted);
 
     return res.status(200).json({
