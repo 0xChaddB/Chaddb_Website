@@ -32,7 +32,7 @@ const relayer = new Relayer({
   apiSecret: process.env.DEFENDER_API_SECRET,
 });
 const publicClient = createPublicClient({
-  chain: polygonAmoy,
+  chain: polygon,
   transport: http(process.env._RPC_URL),
 });
 
