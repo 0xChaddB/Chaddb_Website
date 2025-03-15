@@ -1,54 +1,43 @@
-# React + TypeScript + Vite
+# 0xChaddB Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to my Web3 portfolio! This site showcases my blockchain development skills with a custom NFT minting system, project showcase, and tech stack overview. Built with cutting-edge tools and deployed on Polygon.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **NFT Minting**: Claim a free "Visitor Badge" NFT with randomly generated SVG colors.
+- **Project Carousel**: Interactive showcase of my Web3 projects with tags and links.
+- **Tech Stack**: Highlights my skills in Solidity, React, TypeScript, and more.
+- **Gasless Transactions**: Powered by OpenZeppelin Defender for a smooth experience.
+- **Responsive Design**: Futuristic UI optimized for desktop and mobile.
+- **Real-Time Updates**: Tracks NFT mints via blockchain events.
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Frontend**:
+  - React
+  - TypeScript
+  - Vite
+  - RainbowKit (wallet integration)
+  - Wagmi (blockchain hooks)
+- **Backend**:
+  - Node.js
+  - Viem (blockchain interactions)
+  - Pinata SDK (IPFS storage)
+  - OpenZeppelin Defender Relayer
+- **Blockchain**:
+  - Polygon network
+  - ERC-721 smart contract (see `nftABI.json`)
+- **Styling**: Custom CSS with variables, gradients, and animations
+- **Dependencies**: Listed in `api/package.json` and frontend setup in `src/`
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Prerequisites
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Node.js (v16+ recommended)
+- npm or yarn
+- Polygon RPC URL (e.g., Alchemy or Infura)
+- Pinata API Key and Secret (for IPFS)
+- OpenZeppelin Defender API Key and Secret
+- WalletConnect Project ID (for RainbowKit)
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+This website is in constant development and will be upgraded over time
