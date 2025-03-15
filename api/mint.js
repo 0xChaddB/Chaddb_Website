@@ -16,7 +16,7 @@ const requiredEnvVars = [
   'PINATA_API_SECRET',
   'DEFENDER_API_KEY',
   'DEFENDER_API_SECRET',
-  '_RPC_URL' 
+  'RPC_URL' 
 ];
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
