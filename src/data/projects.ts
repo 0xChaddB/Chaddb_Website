@@ -2,6 +2,20 @@ import { ProjectCardProps } from '../components/ProjectCard';
 
 export const projectsData: ProjectCardProps[] = [
   {
+    id: "Visitor-NFT",
+    title: "VisitorNFT",
+    tags: ["Solidity", "React", "viem"],
+    description: "A simple NFT project for the visitor of this website.",
+    link: "https://github.com/0xChaddB/ChadVault"
+  },
+  {
+    id: "chad-vault",
+    title: "ChadVault",
+    tags: ["Solidity", "DeFi", "Web3"],
+    description: "Advanced Vault with multiple yielding mechanism.",
+    link: "https://github.com/0xChaddB/ChadVault"
+  },
+  {
     id: "defi-flashloan",
     title: "Flashloan",
     tags: ["Solidity", "React", "Web3"],
@@ -14,14 +28,6 @@ export const projectsData: ProjectCardProps[] = [
     tags: ["ERC-721", "IPFS", "Next.js"],
     description: "Decentralized NFT marketplace with advanced trading features and cross-chain compatibility.",
     link: "https://github.com/0xChaddB/ChadVault"
-  },
-
-  {
-    id: "portfolio-dashboard",
-    title: "Portfolio Dashboard",
-    tags: ["TypeScript", "Wagmi", "Vite"],
-    description: "Web3 portfolio tracker with real-time price updates and customizable asset visualization.",
-    link: undefined
   },
 
   {

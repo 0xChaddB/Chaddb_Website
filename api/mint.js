@@ -16,7 +16,7 @@ const requiredEnvVars = [
   'PINATA_API_SECRET',
   'DEFENDER_API_KEY',
   'DEFENDER_API_SECRET',
-  'RPC_URL' 
+  '_RPC_URL' 
 ];
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
@@ -32,8 +32,8 @@ const relayer = new Relayer({
   apiSecret: process.env.DEFENDER_API_SECRET,
 });
 const publicClient = createPublicClient({
-  chain: polygon,
-  transport: http(process.env.RPC_URL),
+  chain: polygonAmoy,
+  transport: http(process.env._RPC_URL),
 });
 
 // contract abi load
