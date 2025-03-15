@@ -6,7 +6,7 @@ export const projectsData: ProjectCardProps[] = [
     title: "VisitorNFT",
     tags: ["Solidity", "React", "viem"],
     description: "A simple NFT project for the visitor of this website.",
-    link: "https://github.com/0xChaddB/ChadVault"
+    link: "https://github.com/0xChaddB/VisitorNFT"
   },
   {
     id: "chad-vault",
@@ -20,14 +20,14 @@ export const projectsData: ProjectCardProps[] = [
     title: "Flashloan",
     tags: ["Solidity", "React", "Web3"],
     description: "Advanced lending protocol with innovative liquidation mechanisms and multi-token collateral support.",
-    link: "https://github.com/0xChaddB/ChadVault"
+    link: "undefined"
   },
   {
     id: "swapper",
     title: "Swapper",
     tags: ["ERC-721", "IPFS", "Next.js"],
     description: "Decentralized NFT marketplace with advanced trading features and cross-chain compatibility.",
-    link: "https://github.com/0xChaddB/ChadVault"
+    link: "undefined"
   },
 
   {
