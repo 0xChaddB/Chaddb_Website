@@ -5,7 +5,7 @@ export const projectsData: ProjectCardProps[] = [
     id: "Visitor-NFT",
     title: "VisitorNFT",
     tags: ["Solidity", "React", "viem"],
-    description: "A simple NFT project for the visitor of this website.",
+    description: "A gas-less NFT project for the visitor of this website.",
     link: "https://github.com/0xChaddB/VisitorNFT"
   },
   {
