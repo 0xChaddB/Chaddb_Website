@@ -439,7 +439,7 @@ function App() {
 
       {/* Footer */}
       <footer>
-        <p className="footer-text">© 2024 0xChaddB. All rights reserved.</p>
+        <p className="footer-text">© 2025 0xChaddB. All rights reserved.</p>
       </footer>
 
       {/* Loading Popup */}
